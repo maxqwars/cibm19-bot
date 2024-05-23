@@ -8,7 +8,6 @@ import crypto from "node:crypto";
 // Build-in node modules
 import { cwd } from "node:process";
 import { join } from "node:path";
-import { createServer } from "http";
 
 // Bot modules
 import { BotCore } from "./modules/BotCore"; // Main bot class, core functionality class
