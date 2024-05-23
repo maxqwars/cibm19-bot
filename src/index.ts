@@ -37,9 +37,9 @@ const TG_WEBHOOK_PORT = process.env["TG_WEBHOOK_PORT"];
 const MODE = process.env["MODE"] || "development";
 const MEMCACHED_HOSTS = process.env["MEMCACHED_HOSTS"];
 
-for (const key in process.env) {
-  logger.info(`Env key: ${key}, value: ${process.env[key]}`);
-}
+// for (const key in process.env) {
+//   logger.info(`Env key: ${key}, value: ${process.env[key]}`);
+// }
 
 // Init external packages
 const prisma = new PrismaClient(); // ORM tool
