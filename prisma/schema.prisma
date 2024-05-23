@@ -1,0 +1,64 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model Organization {
+    id         Int      @id @default(autoincrement())
+    name       String   @unique
+    nameHash   String   @unique
+    createdAt  DateTime @default(now())
+    updatedtAt DateTime @default(now())
+    closed     Boolean  @default(false)
+
+    // Relations
+    members Volonteer[]
+    Claim   Claim[]
+}
+
+model Volonteer {
+    id                 Int      @id @default(autoincrement())
+    role               String
+    createdAt          DateTime @default(now())
+    updatedtAt         DateTime @default(now())
+    name               String
+    telegramId         BigInt   @unique
+    telegramUsername   String
+    telegramName       String
+    flowNextHandlerKey String
+    latestMessage      String
+    balance            Int      @default(0)
+
+    // Relations
+    Organization   Organization? @relation(fields: [organizationId], references: [id])
+    organizationId Int?
+    Report         Report[]
+    Claim          Claim[]
+}
+
+model Report {
+    id        Int      @id @default(autoincrement())
+    createdAt DateTime @default(now())
+    payload   String
+    hash      String
+    confirmed Boolean  @default(false)
+
+    // Relations
+    volonteer   Volonteer @relation(fields: [volonteerId], references: [id])
+    volonteerId Int
+}
+
+model Claim {
+    id        Int      @id @default(autoincrement())
+    createdAt DateTime @default(now())
+
+    // Relations
+    volonteer      Volonteer    @relation(fields: [volonteerId], references: [id])
+    organization   Organization @relation(fields: [organizationId], references: [id])
+    volonteerId    Int
+    organizationId Int
+}

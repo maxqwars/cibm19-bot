@@ -1,0 +1,77 @@
+version: "3.9"
+
+# Configure network
+networks:
+  cibm_bot_net:
+    driver: bridge
+    enable_ipv6: false
+    internal: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.238.0/24
+  default:
+    driver: host
+
+volumes:
+  cibm-bot-data:
+
+
+services:
+
+  # CIBM bot main
+  bot:
+    build: .
+    command: "npm run deploy-and-start"
+    environment:
+      DATABASE_URL: "${DATABASE_URL}"
+      TG_BOT_TOKEN: "${TG_BOT_TOKEN}"
+      ADMINISTRATORS_TG_IDS: "${ADMINISTRATORS_TG_IDS}"
+      DATA_ENCRIPTION_KEY: "${DATA_ENCRIPTION_KEY}"
+      TG_WEBHOOK_DOMAIN: "${TG_WEBHOOK_DOMAIN}"
+      TG_WEBHOOK_PORT: "${TG_WEBHOOK_PORT}"
+      MODE: "${MODE}"
+      MEMCACHED_HOSTS: "${MEMCACHED_HOSTS}"
+    depends_on:
+      db:
+        condition: service_started
+      memcached:
+        condition: service_started
+    ports:
+      - "80:3000"
+    networks:
+      cibm_bot_net:
+        ipv4_address: 172.16.238.4
+      default:
+
+
+  memcached:
+    image: memcached:1.6.27-bookworm
+    restart: always
+    ports:
+      - "11211:11211"
+    networks:
+      cibm_bot_net:
+        ipv4_address: 172.16.238.5
+
+  # Database service
+  db:
+    image: postgres:16.3
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U habrpguser -d habrdb" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    shm_size: 128mb
+    environment:
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+    volumes:
+      - .:/docker-entrypoint-initdb.d
+      - cibm19-bot-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      cibm_bot_net:
+        ipv4_address: 172.16.238.3
