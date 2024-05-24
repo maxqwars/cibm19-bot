@@ -107,6 +107,7 @@ bot.command("start", (context: Context) => core.start(context));
 bot.command("help", (context: Context) => core.help(context));
 bot.command("privacy", (context: Context) => core.privacy(context));
 bot.command("cancel", (context) => core.cancel(context));
+bot.command("profile", (context) => core.profile(context))
 
 /* -------------------------- Adminstrator commands ------------------------- */
 bot.command("create_org", (context: Context) =>

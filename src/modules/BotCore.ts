@@ -647,9 +647,9 @@ export class BotCore {
     return;
   }
 
-  async addAdmin(context: Context) {}
+  async addAdmin(context: Context) { }
 
-  async statistic(context: Context) {}
+  async statistic(context: Context) { }
 
   /* -------------------------------------------------------------------------- */
   /*                          Curator specific commands                         */
@@ -697,25 +697,65 @@ export class BotCore {
     return;
   }
 
-  async members(context: Context) {}
+  async members(context: Context) { }
 
   /* -------------------------------------------------------------------------- */
   /*                          Member specific commands                          */
   /* -------------------------------------------------------------------------- */
 
-  async sendCuratorMessage() {}
+  async sendCuratorMessage() { }
 
   /* -------------------------------------------------------------------------- */
   /*                      Context specific common commands                      */
   /* -------------------------------------------------------------------------- */
 
-  async profile(context: Context) {}
+  async profile(context: Context) {
 
-  async organization(context: Context) {}
+    const coreContext = await this.getCoreContext(context.from.id)
 
-  async sendMessageToAdmin(context: Context) {}
 
-  async announcement(context: Context) {}
+    switch (coreContext.role) {
+
+      case 'unknown': {
+        const replyMessage = await this._render.render("you_not_registered.txt", {})
+        context.reply(replyMessage)
+        break;
+      }
+
+      case 'admin': {
+        const replyMessage = await this._render.render("you_admin.txt", {})
+        context.reply(replyMessage)
+        break;
+      }
+
+      case 'member': {
+        const replyMessage = await this._render.render("member_profile.txt", {})
+        context.reply(replyMessage)
+        break;
+      }
+
+      case 'curator': {
+        const replyMessage = await this._render.render('cuator_profile.txt', {})
+        context.reply(replyMessage)
+        break;
+      }
+
+      default: {
+        const replyMessage = await this._render.render("unknown_error.txt", {})
+        context.reply(replyMessage)
+        return;
+      }
+    }
+
+    return;
+
+  }
+
+  async organization(context: Context) { }
+
+  async sendMessageToAdmin(context: Context) { }
+
+  async announcement(context: Context) { }
 
   /* -------------------------------------------------------------------------- */
   /*                          Unknown specific commands                         */
