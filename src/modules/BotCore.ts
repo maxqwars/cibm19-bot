@@ -12,6 +12,7 @@ import logger from "../logger";
 // Helpers
 import { calculateHash } from "../helpers/calculateHash";
 import { isWebLink } from "../helpers/isWebLink";
+import { HandlerType } from '../helpers/Scriptor'
 
 // Models
 import { OrganizationsModel } from "../models/OrganizationsModel";
@@ -22,8 +23,7 @@ import { ReportsModel } from "../models/ReportsModel";
 import { Cache } from "../modules/Cache";
 import { Cryptography } from "../modules/Cryptography";
 import { VolonteersModel } from "../models/VolonteersModel";
-import { Scriptor } from "./Scriptor";
-import { ADVANCED_SCRIPT_STAGES, advancedScript } from "../scripts/advanced";
+import { advancedScript2 } from "../scripts/advanced2";
 
 /* -------------------------------------------------------------------------- */
 /*                                  Constants                                 */
@@ -332,30 +332,28 @@ export class BotCore {
 
   async onMessageEventHandlerBasedOnScriptor(context: Context) {
     const coreContext = await this.getCoreContext(context.from.id);
+    const scripts = [advancedScript2];
+    const mapping: { [key: string]: HandlerType } = {};
 
-    const advancedScrpt = new Scriptor(
-      {
-        scriptKeys: Object.keys(ADVANCED_SCRIPT_STAGES),
-        scriptName: "Advanced Script",
-      },
-      { core: this },
-      advancedScript,
-    );
+    //  { [key: string]: HandlerType }
 
-    const stages = {};
+    for (const script of scripts) {
+      const { stages } = script;
 
-    for (const key of advancedScrpt.keys) {
-      stages[key] = advancedScrpt.getScript();
+      for (const stage of stages) {
+        mapping[stage] = script.handler
+      }
     }
 
-    console.log(stages);
-
-    const script = stages[coreContext.flowNextHandlerKey];
-
-    // execute script
-    script(context, coreContext, this)
-
-    return;
+    try {
+      const scriptHandler = mapping[coreContext.flowNextHandlerKey]
+      await scriptHandler(context, coreContext, this)
+      return;
+    } catch (err) {
+      logger.error(`Failed complete script stage '${coreContext.flowNextHandlerKey}', reason:`)
+      logger.error(err.message)
+      return;
+    }
   }
 
   async onCallbackQueryEventHandler(context: Context) {
