@@ -361,6 +361,8 @@ export class BotCore {
         `Failed complete script stage '${coreContext.flowNextHandlerKey}', reason:`,
       );
       logger.error(err.message);
+      const replyContent = await this._render.render("unknown_error.txt", {});
+      context.reply(replyContent);
       return;
     }
   }

@@ -20,7 +20,11 @@ const advancedScript = (
       coreContext: BotCoreContextType,
       core: BotCore,
     ) => {})(context, coreContext, core)
-      .then(() => {
+      .then(async () => {
+        await core.volonteers.updateVolonteerFlowNextHandlerKey(
+          coreContext.id,
+          "",
+        );
         context.reply(`Stage 1 passed`);
         resolve(null);
         return;
