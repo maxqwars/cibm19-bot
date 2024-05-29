@@ -9,11 +9,21 @@ export type HandlerType = {
   ): Promise<unknown>;
 };
 
+export type InitialCommandCbType = {
+  (context: Context, core: BotCore): Promise<void>;
+};
+
+export type InitialCommandType = {
+  command: string;
+  callback: InitialCommandCbType;
+};
+
 type ScriptorOptionsType = {
   stages: string[];
   startStage?: string;
   endStage?: string;
   handler: HandlerType;
+  initialCommand: InitialCommandType;
 };
 
 export class Scriptor {
@@ -27,6 +37,7 @@ export class Scriptor {
       core: BotCore,
     ): Promise<unknown>;
   };
+  private readonly _initialCommand: InitialCommandType;
 
   constructor(options: ScriptorOptionsType) {
     this._stages = options.stages;
@@ -34,6 +45,7 @@ export class Scriptor {
     this._endStage =
       options.endStage || options.stages[options.stages.length - 1];
     this._handler = options.handler;
+    this._initialCommand = options.initialCommand;
   }
 
   get startStage() {
@@ -50,5 +62,9 @@ export class Scriptor {
 
   get handler() {
     return this._handler;
+  }
+
+  get initialCommand() {
+    return this._initialCommand;
   }
 }

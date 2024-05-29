@@ -19,11 +19,10 @@ const advancedScript = (
       context: Context,
       coreContext: BotCoreContextType,
       core: BotCore,
-    ) => {
-    })(context, coreContext, core)
+    ) => {})(context, coreContext, core)
       .then(() => {
-        context.reply(`Stage 1 passed`)
-        resolve(null)
+        context.reply(`Stage 1 passed`);
+        resolve(null);
         return;
       })
       .catch((err) => {
@@ -35,4 +34,16 @@ const advancedScript = (
 export const advancedScript2 = new Scriptor({
   stages: Object.keys(ADVANCED_SCRPT_STAGES),
   handler: advancedScript,
+  initialCommand: {
+    command: "advanced",
+    callback: async (context: Context, core: BotCore) => {
+      const { id } = await core.getCoreContext(context.from.id);
+      await core.volonteers.updateVolonteerFlowNextHandlerKey(
+        id,
+        Object.keys(ADVANCED_SCRPT_STAGES)[0],
+      );
+      context.reply(`Sequence started...`);
+      return;
+    },
+  },
 });

@@ -55,6 +55,9 @@ const volonteers = new VolonteersModel(prisma, cache); // Volonteers data manipu
 const organizations = new OrganizationsModel(prisma, cache); // Organizations data manipulations
 const reports = new ReportsModel(prisma, cache); // Reports data manipulations
 
+// Scripts
+import { advancedScript2 } from "./scripts/advanced2";
+
 // Init bot core functionality
 const core = new BotCore(
   {
@@ -65,7 +68,10 @@ const core = new BotCore(
     reports,
     render,
   },
-  { superAdminId: ADMINISTRATORS_TG_IDS.split(",").map((id) => Number(id)) },
+  {
+    superAdminId: ADMINISTRATORS_TG_IDS.split(",").map((id) => Number(id)),
+    scripts: [advancedScript2],
+  },
 );
 
 // Create telegraf bot
@@ -101,6 +107,16 @@ bot.use(async (ctx: Context, next) => {
   await core.updateVolonteerData(ctx);
   await next();
 });
+
+// Init scripts commands
+const scripts = core.scripts;
+
+for (const script of scripts) {
+  const {
+    initialCommand: { command, callback },
+  } = script;
+  bot.command(command, (context: Context) => callback(context, core));
+}
 
 /* ----------------------------- Common commands ---------------------------- */
 bot.command("start", (context: Context) => core.start(context));

@@ -12,7 +12,7 @@ import logger from "../logger";
 // Helpers
 import { calculateHash } from "../helpers/calculateHash";
 import { isWebLink } from "../helpers/isWebLink";
-import { HandlerType } from '../helpers/Scriptor'
+import { HandlerType, Scriptor } from "../helpers/Scriptor";
 
 // Models
 import { OrganizationsModel } from "../models/OrganizationsModel";
@@ -105,10 +105,12 @@ type BotCoreDependencies = {
 
 type BotCoreOptions = {
   superAdminId: number[];
+  scripts: Scriptor[];
 };
 
 export class BotCore {
   private readonly _superAdminId: number[];
+  private readonly _scripts: Scriptor[];
 
   private readonly _volonteers: VolonteersModel;
   private readonly _organizations: OrganizationsModel;
@@ -132,6 +134,7 @@ export class BotCore {
 
   constructor(deps: BotCoreDependencies, options: BotCoreOptions) {
     this._superAdminId = options.superAdminId;
+    this._scripts = options.scripts;
 
     // Set dependencies modules
     this._volonteers = deps.volonteers;
@@ -187,6 +190,10 @@ export class BotCore {
 
   get organizations() {
     return this._organizations;
+  }
+
+  get scripts() {
+    return this._scripts;
   }
 
   private async _readFileFromContentDir(filename) {
@@ -341,17 +348,19 @@ export class BotCore {
       const { stages } = script;
 
       for (const stage of stages) {
-        mapping[stage] = script.handler
+        mapping[stage] = script.handler;
       }
     }
 
     try {
-      const scriptHandler = mapping[coreContext.flowNextHandlerKey]
-      await scriptHandler(context, coreContext, this)
+      const scriptHandler = mapping[coreContext.flowNextHandlerKey];
+      await scriptHandler(context, coreContext, this);
       return;
     } catch (err) {
-      logger.error(`Failed complete script stage '${coreContext.flowNextHandlerKey}', reason:`)
-      logger.error(err.message)
+      logger.error(
+        `Failed complete script stage '${coreContext.flowNextHandlerKey}', reason:`,
+      );
+      logger.error(err.message);
       return;
     }
   }
@@ -684,9 +693,9 @@ export class BotCore {
     return;
   }
 
-  async addAdmin(context: Context) { }
+  async addAdmin(context: Context) {}
 
-  async statistic(context: Context) { }
+  async statistic(context: Context) {}
 
   /* -------------------------------------------------------------------------- */
   /*                          Curator specific commands                         */
@@ -734,13 +743,13 @@ export class BotCore {
     return;
   }
 
-  async members(context: Context) { }
+  async members(context: Context) {}
 
   /* -------------------------------------------------------------------------- */
   /*                          Member specific commands                          */
   /* -------------------------------------------------------------------------- */
 
-  async sendCuratorMessage() { }
+  async sendCuratorMessage() {}
 
   /* -------------------------------------------------------------------------- */
   /*                      Context specific common commands                      */
@@ -793,11 +802,11 @@ export class BotCore {
     return;
   }
 
-  async organization(context: Context) { }
+  async organization(context: Context) {}
 
-  async sendMessageToAdmin(context: Context) { }
+  async sendMessageToAdmin(context: Context) {}
 
-  async announcement(context: Context) { }
+  async announcement(context: Context) {}
 
   /* -------------------------------------------------------------------------- */
   /*                          Unknown specific commands                         */
