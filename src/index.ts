@@ -107,7 +107,7 @@ bot.command("start", (context: Context) => core.start(context));
 bot.command("help", (context: Context) => core.help(context));
 bot.command("privacy", (context: Context) => core.privacy(context));
 bot.command("cancel", (context) => core.cancel(context));
-bot.command("profile", (context) => core.profile(context))
+bot.command("profile", (context) => core.profile(context));
 
 /* -------------------------- Adminstrator commands ------------------------- */
 bot.command("create_org", (context: Context) =>
@@ -138,7 +138,7 @@ bot.command("register", (context: Context) => {
 // Bind raw message handler
 bot.on(
   "message",
-  async (ctx: Context) => await core.onMessageEventHandler(ctx),
+  async (ctx: Context) => await core.onMessageEventHandlerBasedOnScriptor(ctx),
 );
 
 // Bind callback_query handler

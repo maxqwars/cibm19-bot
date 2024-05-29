@@ -22,6 +22,8 @@ import { ReportsModel } from "../models/ReportsModel";
 import { Cache } from "../modules/Cache";
 import { Cryptography } from "../modules/Cryptography";
 import { VolonteersModel } from "../models/VolonteersModel";
+import { Scriptor } from "./Scriptor";
+import { ADVANCED_SCRIPT_STAGES, advancedScript } from "../scripts/advanced";
 
 /* -------------------------------------------------------------------------- */
 /*                                  Constants                                 */
@@ -60,7 +62,7 @@ enum FLOW_HANDLERS {
 /*                                    Types                                   */
 /* -------------------------------------------------------------------------- */
 
-type BotCoreContextType = {
+export type BotCoreContextType = {
   id: number;
   role: string;
   name: string;
@@ -176,6 +178,15 @@ export class BotCore {
     this._cbQueryHandlers = {
       curator: this._curatorCbQueryHandlers,
     };
+  }
+
+  // Getters
+  get volonteers() {
+    return this._volonteers;
+  }
+
+  get organizations() {
+    return this._organizations;
   }
 
   private async _readFileFromContentDir(filename) {
@@ -317,6 +328,34 @@ export class BotCore {
       context.reply(replyContent);
       return;
     }
+  }
+
+  async onMessageEventHandlerBasedOnScriptor(context: Context) {
+    const coreContext = await this.getCoreContext(context.from.id);
+
+    const advancedScrpt = new Scriptor(
+      {
+        scriptKeys: Object.keys(ADVANCED_SCRIPT_STAGES),
+        scriptName: "Advanced Script",
+      },
+      { core: this },
+      advancedScript,
+    );
+
+    const stages = {};
+
+    for (const key of advancedScrpt.keys) {
+      stages[key] = advancedScrpt.getScript();
+    }
+
+    console.log(stages);
+
+    const script = stages[coreContext.flowNextHandlerKey];
+
+    // execute script
+    script(context, coreContext, this)
+
+    return;
   }
 
   async onCallbackQueryEventHandler(context: Context) {
@@ -710,45 +749,50 @@ export class BotCore {
   /* -------------------------------------------------------------------------- */
 
   async profile(context: Context) {
-
-    const coreContext = await this.getCoreContext(context.from.id)
-
+    const coreContext = await this.getCoreContext(context.from.id);
 
     switch (coreContext.role) {
-
-      case 'unknown': {
-        const replyMessage = await this._render.render("you_not_registered.txt", {})
-        context.reply(replyMessage)
+      case "unknown": {
+        const replyMessage = await this._render.render(
+          "you_not_registered.txt",
+          {},
+        );
+        context.reply(replyMessage);
         break;
       }
 
-      case 'admin': {
-        const replyMessage = await this._render.render("you_admin.txt", {})
-        context.reply(replyMessage)
+      case "admin": {
+        const replyMessage = await this._render.render("you_admin.txt", {});
+        context.reply(replyMessage);
         break;
       }
 
-      case 'member': {
-        const replyMessage = await this._render.render("member_profile.txt", {})
-        context.reply(replyMessage)
+      case "member": {
+        const replyMessage = await this._render.render(
+          "member_profile.txt",
+          {},
+        );
+        context.reply(replyMessage);
         break;
       }
 
-      case 'curator': {
-        const replyMessage = await this._render.render('cuator_profile.txt', {})
-        context.reply(replyMessage)
+      case "curator": {
+        const replyMessage = await this._render.render(
+          "cuator_profile.txt",
+          {},
+        );
+        context.reply(replyMessage);
         break;
       }
 
       default: {
-        const replyMessage = await this._render.render("unknown_error.txt", {})
-        context.reply(replyMessage)
+        const replyMessage = await this._render.render("unknown_error.txt", {});
+        context.reply(replyMessage);
         return;
       }
     }
 
     return;
-
   }
 
   async organization(context: Context) { }

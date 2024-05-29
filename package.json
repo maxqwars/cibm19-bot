@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-  	"deploy-and-start": "npx prisma db push --skip-generate && node build/index.cjs",
+    "deploy-and-start": "npx prisma db push --skip-generate && node build/index.cjs",
     "build": "rollup -c rollup.config.js",
     "dev": "rollup -c -w rollup.config.js"
   },

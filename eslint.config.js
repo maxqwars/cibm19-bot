@@ -9,6 +9,6 @@ export default [
   ...tseslint.configs.recommended,
   eslintConfigPrettier,
   {
-    file: ["src/**/*.{js,ts}"]
-  }
+    file: ["src/**/*.{js,ts}"],
+  },
 ];
