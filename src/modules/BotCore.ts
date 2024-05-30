@@ -1,7 +1,7 @@
 import { Context, Telegraf } from "telegraf";
 import { Scriptor } from "../helpers/Scriptor";
 import { Update } from "telegraf/typings/core/types/typegram";
-import logger from '../logger'
+import logger from "../logger";
 
 type CoreContextType = {
   volonteerId: number;
@@ -22,14 +22,16 @@ type CoreOptionsType = {
 };
 
 interface IBotCoreConstructable {
-  new(options: CoreOptionsType, dependencies: CoreDependenciesType): IBotCore;
+  new (options: CoreOptionsType, dependencies: CoreDependenciesType): IBotCore;
 }
 
 interface IBotCore {
   generateFlowToScriptMap(): IBotCore;
-  bindEntryPoints(bot: Telegraf<Context<Update>>): IBotCore
-
+  bindEntryPoints(bot: Telegraf<Context<Update>>): IBotCore;
+  bindOnMessageEvent(bot: Telegraf<Context<Update>>): IBotCore;
+  bindOnCallbackQueryEvent(bot: Telegraf<Context<Update>>): IBotCore;
   rawMessage(context: Context): Promise<void>;
+  callbackQuery(context: Context): Promise<void>;
   flushFlow(id: number): Promise<void>;
   getContext(telegramId: number): Promise<void>;
 }
@@ -45,15 +47,24 @@ export class BotCore implements IBotCore {
     this._preDefinedAdmins = options.preDefinedAdmins;
   }
 
-  bindEntryPoints(bot: Telegraf<Context<Update>>): IBotCore {
+  bindOnMessageEvent(bot: Telegraf<Context<Update>>): IBotCore {
+    bot.on("message", (context) => this.rawMessage(context));
+    return this;
+  }
 
+  bindOnCallbackQueryEvent(bot: Telegraf<Context<Update>>): IBotCore {
+    bot.on("callback_query", (context) => this.callbackQuery(context));
+    return this;
+  }
+
+  bindEntryPoints(bot: Telegraf<Context<Update>>): IBotCore {
     for (const script of this._scripts) {
-      const { command, cb } = script.entryPoint
-      bot.command(command, async (context: Context) => cb(context, this))
-      logger.info(`Binding ${command}->${script.name}`)
+      const { command, cb } = script.entryPoint;
+      bot.command(command, async (context: Context) => cb(context, this));
+      logger.info(`Binding ${command}->${script.name}`);
     }
 
-    return this
+    return this;
   }
 
   flushFlow(id: number): Promise<void> {
@@ -68,7 +79,11 @@ export class BotCore implements IBotCore {
     throw new Error("Method not implemented.");
   }
 
+  callbackQuery(context: Context<Update>): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
+
   generateFlowToScriptMap(): IBotCore {
-    return this
+    return this;
   }
 }
