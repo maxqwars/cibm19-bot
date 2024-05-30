@@ -111,13 +111,66 @@ const registrationScript = (
 
         return flowCtx;
       })
+      .then(async (flowCtx: FlowContextType): Promise<FlowContextType> => {
+        if (
+          flowCtx.scriptEnd ||
+          flowCtx.coreContext.flowNextHandlerKey !==
+            REGISTRATION_SCRPT_STAGES.REGISTRATION_SEND_REALNAME
+        ) {
+          return flowCtx;
+        }
+
+        const selectedOrg = await core.organizations.findOrgById(
+          Number(context.text.trim()),
+        );
+
+        if (!selectedOrg) {
+          let formattedOrgsList = "👻";
+          const orgs = await core.organizations.getOpenOrgs();
+
+          if (orgs.length > 0) {
+            formattedOrgsList = "";
+            for (const org of orgs) {
+              formattedOrgsList += `${org.id} -> ${org.name}\n`;
+            }
+          }
+
+          const replyContent = await core.render.render(
+            "org_not_found_retry.txt",
+            { openOrgsList: formattedOrgsList },
+          );
+          context.reply(replyContent);
+
+          return flowCtx;
+        }
+
+        const createdClaim = await core.organizations.createClaim(
+          coreContext.id,
+          selectedOrg.id,
+        );
+
+        const replyContent = await core.render.render(
+          "claim_created_wait_response.txt",
+          { claimId: createdClaim.id },
+        );
+
+        context.reply(replyContent);
+
+        const updated = await core.volonteers.updateVolonteerFlowNextHandlerKey(
+          coreContext.id,
+          "",
+        );
+
+        return {
+          scriptEnd: true,
+        };
+      })
       .then(() => resolve(true))
       .catch((err) => {
         logger.error(`Failed complete registration script, reason:`);
         logger.error(err.message);
         reject(err);
       });
-
   });
 };
 
