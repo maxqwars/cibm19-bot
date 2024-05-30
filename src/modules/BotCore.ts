@@ -196,6 +196,10 @@ export class BotCore {
     return this._scripts;
   }
 
+  get render() {
+    return this._render;
+  }
+
   private async _readFileFromContentDir(filename) {
     const contentDir = join(cwd(), "./src/content");
     const cached = await this._cache.get(filename);

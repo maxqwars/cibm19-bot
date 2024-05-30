@@ -5,9 +5,11 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "deploy-and-start": "npx prisma db push --skip-generate && node build/index.cjs",
+    "deply-and-start": "npx prisma db push --skip-generate && node build/index.cjs",
     "build": "rollup -c rollup.config.js",
-    "dev": "rollup -c -w rollup.config.js"
+    "dev": "rollup -w -c rollup.config.js",
+    "format": "prettier . --write",
+    "lint": "eslint --fix -c eslint.config.js !NOT_WORK"
   },
   "keywords": [],
   "author": "",

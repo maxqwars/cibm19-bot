@@ -18,6 +18,13 @@ export type InitialCommandType = {
   callback: InitialCommandCbType;
 };
 
+export type FlowContextType = {
+  scriptEnd: boolean;
+  context?: Context;
+  coreContext?: BotCoreContextType;
+  core?: BotCore;
+};
+
 type ScriptorOptionsType = {
   stages: string[];
   startStage?: string;
