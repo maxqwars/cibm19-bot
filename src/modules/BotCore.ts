@@ -343,21 +343,25 @@ export class BotCore {
 
   async onMessageEventHandlerBasedOnScriptor(context: Context) {
     const coreContext = await this.getCoreContext(context.from.id);
-    const scripts = [advancedScript2];
+    const scripts = this._scripts;
     const mapping: { [key: string]: HandlerType } = {};
 
-    //  { [key: string]: HandlerType }
-
     for (const script of scripts) {
+      logger.info(`Binding script ${script.stages[0]}...`);
       const { stages } = script;
-
       for (const stage of stages) {
+        logger.info(`Binding stage ${script.stages[0]}${stage}...`);
         mapping[stage] = script.handler;
       }
     }
 
+    for (const key in mapping) {
+      logger.info(`${key} -> ${typeof mapping[key]}`);
+    }
+
     try {
       const scriptHandler = mapping[coreContext.flowNextHandlerKey];
+      logger.info(`scriptHnadler type: ${typeof scriptHandler}`);
       await scriptHandler(context, coreContext, this);
       return;
     } catch (err) {
@@ -365,6 +369,10 @@ export class BotCore {
         `Failed complete script stage '${coreContext.flowNextHandlerKey}', reason:`,
       );
       logger.error(err.message);
+      logger.error(`Details:`);
+      logger.error(
+        `[coreContext.flowNextHandlerKey:${coreContext.flowNextHandlerKey}] [coreContext.role:${coreContext.role}] [coreContext.latestMessage:${coreContext.latestMessage}]`,
+      );
       const replyContent = await this._render.render("unknown_error.txt", {});
       context.reply(replyContent);
       return;

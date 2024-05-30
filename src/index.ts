@@ -57,6 +57,8 @@ const reports = new ReportsModel(prisma, cache); // Reports data manipulations
 
 // Scripts
 import { advancedScript2 } from "./scripts/advanced2";
+import { registrationScriptData } from "./scripts/registration";
+import { setCuratorScriptData } from "./scripts/setCurator";
 
 // Init bot core functionality
 const core = new BotCore(
@@ -70,7 +72,7 @@ const core = new BotCore(
   },
   {
     superAdminId: ADMINISTRATORS_TG_IDS.split(",").map((id) => Number(id)),
-    scripts: [advancedScript2],
+    scripts: [registrationScriptData, setCuratorScriptData, advancedScript2],
   },
 );
 
@@ -115,41 +117,42 @@ for (const script of scripts) {
   const {
     initialCommand: { command, callback },
   } = script;
+  // console.log(`${command} / ${callback}`);
   bot.command(command, (context: Context) => callback(context, core));
 }
 
 /* ----------------------------- Common commands ---------------------------- */
-bot.command("start", (context: Context) => core.start(context));
-bot.command("help", (context: Context) => core.help(context));
-bot.command("privacy", (context: Context) => core.privacy(context));
-bot.command("cancel", (context) => core.cancel(context));
-bot.command("profile", (context) => core.profile(context));
+// bot.command("start", (context: Context) => core.start(context));
+// bot.command("help", (context: Context) => core.help(context));
+// bot.command("privacy", (context: Context) => core.privacy(context));
+// bot.command("cancel", (context) => core.cancel(context));
+// bot.command("profile", (context) => core.profile(context));
 
 /* -------------------------- Adminstrator commands ------------------------- */
-bot.command("create_org", (context: Context) =>
-  core.createOrganization(context),
-);
+// bot.command("create_org", (context: Context) =>
+//   core.createOrganization(context),
+// );
 
-bot.command("set_curator", (context: Context) =>
-  core.setCuratorForOrganization(context),
-);
+// bot.command("set_curator", (context: Context) =>
+//   core.setCuratorForOrganization(context),
+// );
 
-bot.command("orgs", (context: Context) => {
-  core.listOfOrgs(context);
-});
+// bot.command("orgs", (context: Context) => {
+//   core.listOfOrgs(context);
+// });
 
-bot.command("reports", (context: Context) => core.lastReports(context));
+// bot.command("reports", (context: Context) => core.lastReports(context));
 
 /* -------------------------------------------------------------------------- */
 /*                              Curator commands                              */
 /* -------------------------------------------------------------------------- */
 
-bot.command("claims", (context: Context) => core.claims(context));
+// bot.command("claims", (context: Context) => core.claims(context));
 
 /* ---------------------------- Unknown commands ---------------------------- */
-bot.command("register", (context: Context) => {
-  core.register(context);
-});
+// bot.command("register", (context: Context) => {
+//   core.register(context);
+// });
 
 // Bind raw message handler
 bot.on(

@@ -24,17 +24,18 @@ const registrationScript = (
           coreContext.id,
           "",
         );
-        const replyContent = await core.render.render(
-          "registration_not_required.txt",
-          {},
-        );
 
         if (updated === null)
           logger.error(
             `Failed update flow prop for volonteer @${coreContext.tgUsername}`,
           );
 
+        const replyContent = await core.render.render(
+          "registration_not_required.txt",
+          {},
+        );
         context.reply(replyContent);
+
         return {
           scriptEnd: true,
         };
@@ -185,7 +186,11 @@ export const registrationScriptData = new Scriptor({
         id,
         Object.keys(REGISTRATION_SCRPT_STAGES)[0],
       );
-      context.reply(`Sequence started...`);
+      const replyContent = await core.render.render(
+        "registration_not_required.txt",
+        {},
+      );
+      context.reply(replyContent);
       return;
     },
   },
