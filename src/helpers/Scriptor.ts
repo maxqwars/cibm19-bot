@@ -13,26 +13,17 @@ type StageHandlerType = {
 };
 
 type KeyToHandlerMapItemType = {
-  key: string;
   handler: StageHandlerType;
-  afterKey: string;
-  afterErrKey: string;
 };
 
 type ScriptorOptionsType = {
   name: string;
-  flowKeys: string[];
   entryPoint: EntryPointType;
 };
 
 interface IScriptor {
   flowKeys: string[];
-  addStage(
-    key: string,
-    handler: StageHandlerType,
-    afterKey: string,
-    afterErrKey?: string,
-  ): IScriptor;
+  addStage(handler: StageHandlerType): IScriptor;
   execute(
     key: string,
     context: Context<Update>,
@@ -55,7 +46,7 @@ export class Scriptor implements IScriptor {
 
   constructor(options: ScriptorOptionsType) {
     this._name = options.name;
-    this._flowKeys = options.flowKeys;
+    this._flowKeys = [];
     this._entryPoint = options.entryPoint;
     this._keyToHandleMap = {};
   }
@@ -81,24 +72,21 @@ export class Scriptor implements IScriptor {
     logger.info(`Scriptor: Execution "${key}"...`);
 
     try {
-      const { handler, afterKey, afterErrKey } = this._keyToHandleMap[key];
+      const { handler } = this._keyToHandleMap[key];
       await handler(context, core);
     } catch (err) {
       return null;
     }
   }
 
-  addStage(
-    key: string,
-    handler: StageHandlerType,
-    afterKey: string,
-    afterErrKey = "",
-  ): IScriptor {
+  addStage(handler: StageHandlerType): IScriptor {
+    const key =
+      this._flowKeys.length === 0
+        ? `${this._name}_1`
+        : `${this._name}_${this._flowKeys.length + 1}`;
+
     this._keyToHandleMap[key] = {
-      key,
       handler,
-      afterKey,
-      afterErrKey,
     };
 
     this._flowKeys.push(key);

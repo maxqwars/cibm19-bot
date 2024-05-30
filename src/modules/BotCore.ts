@@ -119,8 +119,6 @@ export class BotCore implements IBotCore {
       logger.info(`Complete binding handlers for ${script.name}`);
     }
 
-    console.log(this._flowKeyToScriptMap);
-
     return this;
   }
 }
