@@ -19,6 +19,7 @@ type KeyToHandlerMapItemType = {
 };
 
 type ScriptorOptionsType = {
+  name: string
   flowKeys: string[];
   entryPoint: EntryPointType;
 };
@@ -32,6 +33,8 @@ interface IScriptor {
     afterErrKey?: string,
   ): IScriptor;
   execute(context: Context, core: BotCore): Promise<void>;
+  entryPoint: EntryPointType;
+  name: string
 }
 
 interface IScriptorConstructable {
@@ -39,17 +42,32 @@ interface IScriptorConstructable {
 }
 
 export class Scriptor implements IScriptor {
+  private readonly _name: string
   private readonly _flowKeys: string[];
-  private readonly _keyToHandleMap: { [key: string]: KeyToHandlerMapItemType };
+  private readonly _entryPoint: EntryPointType;
+  private _keyToHandleMap: { [key: string]: KeyToHandlerMapItemType };
 
-  constructor(options: ScriptorOptionsType) {}
-
-  execute(context: Context<Update>, core: BotCore): Promise<void> {
-    throw new Error("Method not implemented.");
+  constructor(options: ScriptorOptionsType) {
+    this._name = options.name
+    this._flowKeys = options.flowKeys;
+    this._entryPoint = options.entryPoint;
+    this._keyToHandleMap = {};
   }
 
   get flowKeys() {
     return this._flowKeys;
+  }
+
+  get entryPoint() {
+    return this._entryPoint;
+  }
+
+  get name() {
+    return this._name
+  }
+
+  execute(context: Context<Update>, core: BotCore): Promise<void> {
+    throw new Error("Method not implemented.");
   }
 
   addStage(
