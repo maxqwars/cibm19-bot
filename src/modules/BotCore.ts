@@ -45,6 +45,7 @@ export class BotCore implements IBotCore {
   constructor(options: CoreOptionsType, dependencies: CoreDependenciesType) {
     this._scripts = options.scripts;
     this._preDefinedAdmins = options.preDefinedAdmins;
+    this._flowKeyToScriptMap = {};
   }
 
   bindOnMessageEvent(bot: Telegraf<Context<Update>>): IBotCore {
@@ -86,17 +87,19 @@ export class BotCore implements IBotCore {
 
   async rawMessage(context: Context<Update>): Promise<void> {
     const coreCtx = await this.getContext(context.from.id);
+    logger.info(`Execution script for flow key '${coreCtx.flowKey}'`);
 
     try {
       const script = this._flowKeyToScriptMap[coreCtx.flowKey];
-      await script.execute(context, coreCtx, this);
+      logger.info(script);
+      await script.execute(coreCtx.flowKey, context, coreCtx, this);
     } catch (err) {
       logger.error(
-        `Error in rawMessageHandler while processing stage ${coreCtx.flowKey}, reason:`,
+        `Error in rawMessageHandler while processing stage '${coreCtx.flowKey}', reason:`,
       );
       logger.error(err.message);
       context.reply(
-        `Error in rawMessageHandler while processing stage ${coreCtx.flowKey}, reason: ` +
+        `Error in rawMessageHandler while processing stage '${coreCtx.flowKey}', reason: ` +
           err.message,
       );
       return;
@@ -108,6 +111,16 @@ export class BotCore implements IBotCore {
   }
 
   generateFlowToScriptMap(): IBotCore {
+    for (const script of this._scripts) {
+      for (const key of script.flowKeys) {
+        this._flowKeyToScriptMap[key] = script;
+        logger.info(`Added ${key}->${script.name}`);
+      }
+      logger.info(`Complete binding handlers for ${script.name}`);
+    }
+
+    console.log(this._flowKeyToScriptMap);
+
     return this;
   }
 }

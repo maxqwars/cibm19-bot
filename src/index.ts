@@ -5,6 +5,7 @@ import { env } from "node:process";
 import { BotCore } from "./modules/BotCore";
 import logger from "./logger";
 import { Telegraf } from "telegraf";
+import testScript from "./scripts/testScript";
 
 config();
 
@@ -19,7 +20,7 @@ const memClient = memjs.Client.create(MEMCACHED_HOSTS, {});
 
 const core = new BotCore(
   {
-    scripts: [],
+    scripts: [testScript()],
     preDefinedAdmins: PRE_DEFINED_ADMINS.split(",").map((id) => Number(id)),
   },
   {},
@@ -28,10 +29,10 @@ const core = new BotCore(
 const bot = new Telegraf(TELEGRAM_BOT_TOKEN);
 
 core
-  .bindOnMessageEvent(bot)
-  .bindOnCallbackQueryEvent(bot)
+  .generateFlowToScriptMap()
   .bindEntryPoints(bot)
-  .generateFlowToScriptMap();
+  .bindOnMessageEvent(bot)
+  .bindOnCallbackQueryEvent(bot);
 
 async function runInDevelopment() {
   bot.launch(() => {
