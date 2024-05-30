@@ -1,5 +1,5 @@
 import { Context } from "telegraf";
-import { BotCore } from "../modules/BotCore";
+import { BotCore, CoreContextType } from "../modules/BotCore";
 import { Update } from "telegraf/typings/core/types/typegram";
 
 type EntryPointType = {
@@ -32,7 +32,11 @@ interface IScriptor {
     afterKey: string,
     afterErrKey?: string,
   ): IScriptor;
-  execute(context: Context, core: BotCore): Promise<void>;
+  execute(
+    context: Context<Update>,
+    coreContext: CoreContextType,
+    core: BotCore,
+  ): Promise<void>;
   entryPoint: EntryPointType;
   name: string;
 }
@@ -66,7 +70,11 @@ export class Scriptor implements IScriptor {
     return this._name;
   }
 
-  execute(context: Context<Update>, core: BotCore): Promise<void> {
+  execute(
+    context: Context<Update>,
+    coreContext: CoreContextType,
+    core: BotCore,
+  ): Promise<void> {
     throw new Error("Method not implemented.");
   }
 

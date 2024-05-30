@@ -27,7 +27,11 @@ const core = new BotCore(
 
 const bot = new Telegraf(TELEGRAM_BOT_TOKEN);
 
-core.bindEntryPoints(bot).generateFlowToScriptMap();
+core
+  .bindOnMessageEvent(bot)
+  .bindOnCallbackQueryEvent(bot)
+  .bindEntryPoints(bot)
+  .generateFlowToScriptMap();
 
 async function runInDevelopment() {
   bot.launch(() => {

@@ -3,7 +3,7 @@ import { Scriptor } from "../helpers/Scriptor";
 import { Update } from "telegraf/typings/core/types/typegram";
 import logger from "../logger";
 
-type CoreContextType = {
+export type CoreContextType = {
   volonteerId: number;
   volonteerRole: string;
   volonteerName: string;
@@ -33,14 +33,14 @@ interface IBotCore {
   rawMessage(context: Context): Promise<void>;
   callbackQuery(context: Context): Promise<void>;
   flushFlow(id: number): Promise<void>;
-  getContext(telegramId: number): Promise<void>;
+  getContext(telegramId: number): Promise<CoreContextType>;
 }
 
 export class BotCore implements IBotCore {
   private readonly _scripts: Scriptor[];
   private readonly _preDefinedAdmins: number[];
 
-  private _flowKeyToScriptMap: { [key: string]: Function };
+  private _flowKeyToScriptMap: { [key: string]: Scriptor };
 
   constructor(options: CoreOptionsType, dependencies: CoreDependenciesType) {
     this._scripts = options.scripts;
@@ -71,12 +71,36 @@ export class BotCore implements IBotCore {
     throw new Error("Method not implemented.");
   }
 
-  getContext(telegramId: number): Promise<void> {
-    throw new Error("Method not implemented.");
+  async getContext(telegramId: number): Promise<CoreContextType> {
+    return {
+      volonteerId: 0,
+      volonteerRole: "string",
+      volonteerName: "string",
+      telegramId: 0,
+      telegramUsername: 0,
+      telegramName: "string",
+      flowKey: "string",
+      lastMessage: "string",
+    };
   }
 
-  rawMessage(context: Context<Update>): Promise<void> {
-    throw new Error("Method not implemented.");
+  async rawMessage(context: Context<Update>): Promise<void> {
+    const coreCtx = await this.getContext(context.from.id);
+
+    try {
+      const script = this._flowKeyToScriptMap[coreCtx.flowKey];
+      await script.execute(context, coreCtx, this);
+    } catch (err) {
+      logger.error(
+        `Error in rawMessageHandler while processing stage ${coreCtx.flowKey}, reason:`,
+      );
+      logger.error(err.message);
+      context.reply(
+        `Error in rawMessageHandler while processing stage ${coreCtx.flowKey}, reason: ` +
+          err.message,
+      );
+      return;
+    }
   }
 
   callbackQuery(context: Context<Update>): Promise<void> {
