@@ -11,6 +11,7 @@ import justScript from "./scripts/justCommand";
 
 import { Render } from "./components/Render";
 import { Cache } from "./components/Cache";
+import { Cryptography } from "./components/Cryptography";
 
 config();
 
@@ -24,6 +25,7 @@ const prisma = new PrismaClient();
 const memClient = memjs.Client.create(MEMCACHED_HOSTS, {});
 const cache = new Cache(memClient);
 const render = new Render(join(cwd(), "./src/views"), cache);
+const cryptography = new Cryptography(DATA_ENCRYPTION_KEY, cache);
 
 const core = new BotCore(
   {
@@ -32,8 +34,8 @@ const core = new BotCore(
   },
   [
     {
-      name: "test_function_component",
-      component: () => {},
+      name: "cryptography",
+      component: cryptography,
     },
     {
       name: "cache",
