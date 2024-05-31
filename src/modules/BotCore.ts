@@ -3,7 +3,10 @@ import { Scriptor } from "../helpers/Scriptor";
 import { Update } from "telegraf/typings/core/types/typegram";
 import logger from "../logger";
 
-type CoreDependenciesType = {};
+type CoreComponentsType = {
+  name: string;
+  component: any;
+};
 
 type CoreOptionsType = {
   preDefinedAdmins: number[];
@@ -24,7 +27,7 @@ type SessionItem = {
 };
 
 interface IBotCoreConstructable {
-  new (options: CoreOptionsType, dependencies: CoreDependenciesType): IBotCore;
+  new (options: CoreOptionsType, components: CoreComponentsType): IBotCore;
 }
 
 export interface IBotCore {
@@ -50,10 +53,10 @@ export interface IBotCore {
     bot: Telegraf<Context<Update>>,
     middleware: MiddlewareFunctionType,
   ): IBotCore;
-  modules: string[];
   sessions: { [key: number]: SessionItem };
   init(bot: Telegraf<Context<Update>>): IBotCore;
   setSession(telegramId: number, session: SessionItem): SessionItem;
+  components: { [key: string]: any };
 }
 
 export class BotCore implements IBotCore {
@@ -61,14 +64,22 @@ export class BotCore implements IBotCore {
   private readonly _preDefinedAdmins: number[];
   private readonly _sessions: { [key: number]: SessionItem };
 
-  private _modules: { [key: string]: any };
+  private _components: { [key: string]: any };
   private _flowKeyToScriptMap: { [key: string]: Scriptor };
 
-  constructor(options: CoreOptionsType, dependencies: CoreDependenciesType) {
+  constructor(options: CoreOptionsType, components: CoreComponentsType[]) {
     this._scripts = options.scripts;
     this._preDefinedAdmins = options.preDefinedAdmins;
     this._flowKeyToScriptMap = {};
     this._sessions = {};
+    this._components = {};
+
+    for (const cmp in components) {
+      const { name, component } = components[cmp];
+
+      logger.info(`[BotCore] Registered component ${name}...`);
+      this.components[name] = component;
+    }
   }
 
   setSession(telegramId: number, session: SessionItem): SessionItem {
@@ -92,8 +103,8 @@ export class BotCore implements IBotCore {
     return this;
   }
 
-  get modules() {
-    return Object(this._modules).keys;
+  get components() {
+    return this._components;
   }
 
   get sessions() {
@@ -114,12 +125,12 @@ export class BotCore implements IBotCore {
   }
 
   getModule<T>(name: string): null | T {
-    const module = this._modules[name];
+    const module = this._components[name];
     return module !== null ? (module as T) : null;
   }
 
   addModule<T>(name: string, instance: T): IBotCore {
-    this._modules[name] = instance;
+    this._components[name] = instance;
     return this;
   }
 
@@ -140,7 +151,9 @@ export class BotCore implements IBotCore {
   bindScriptsCommands(bot: Telegraf<Context<Update>>): IBotCore {
     for (const script of this._scripts) {
       const { command, cb } = script.entryPoint;
-      logger.info(`Bind entry command /${command} for script ${script.name}`);
+      logger.info(
+        `[BotCore.bindScriptsCommands] Bind command /${command} for script ${script.name}`,
+      );
       bot.command(command, async (context: Context) => {
         await cb(context, this);
         this.setSession(context.from.id, {
@@ -149,7 +162,7 @@ export class BotCore implements IBotCore {
         });
       });
       logger.info(
-        `Complete bind point for ${script.name}, points list: [${script.stages.join(",")}]`,
+        `[BotCore.bindScriptsCommands] Complete bind point for ${script.name}, points list: [${script.stages.join(",")}]`,
       );
     }
 
@@ -185,10 +198,14 @@ export class BotCore implements IBotCore {
     }
 
     try {
-      logger.info(`Executing script for stage: ${stage}...`);
+      logger.info(
+        `[BotCore.rawMessage] Executing script for stage: ${stage}...`,
+      );
       await script.execute(context, this);
     } catch (err) {
-      logger.error(`Error while execution stage '${stage}' script, reason:`);
+      logger.error(
+        `[BotCore.rawMessage] Error while execution stage '${stage}' script, reason:`,
+      );
       logger.error(err.message);
       this.flushStage(fromId);
       await onErr(context, this);
@@ -204,9 +221,13 @@ export class BotCore implements IBotCore {
     for (const script of this._scripts) {
       for (const stage of script.stages) {
         this._flowKeyToScriptMap[stage] = script;
-        logger.info(`Added ${stage}->${script.name}`);
+        logger.info(
+          `[BotCore.generateStageToScriptorMap] Add stage ${stage}->${script.name}`,
+        );
       }
-      logger.info(`Complete binding handlers for ${script.name}`);
+      logger.info(
+        `[BotCore.generateStageToScriptorMap] Complete load stages for ${script.name}`,
+      );
     }
 
     return this;

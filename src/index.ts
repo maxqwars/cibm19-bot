@@ -24,7 +24,12 @@ const core = new BotCore(
     scripts: [testScript(), justScript()],
     preDefinedAdmins: PRE_DEFINED_ADMINS.split(",").map((id) => Number(id)),
   },
-  {},
+  [
+    {
+      name: "test_function_component",
+      component: () => {},
+    },
+  ],
 );
 
 const bot = new Telegraf(TELEGRAM_BOT_TOKEN);
