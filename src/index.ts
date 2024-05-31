@@ -6,6 +6,7 @@ import { BotCore } from "./modules/BotCore";
 import logger from "./logger";
 import { Telegraf } from "telegraf";
 import testScript from "./scripts/testScript";
+import justScript from "./scripts/justCommand";
 
 config();
 
@@ -20,7 +21,7 @@ const memClient = memjs.Client.create(MEMCACHED_HOSTS, {});
 
 const core = new BotCore(
   {
-    scripts: [testScript()],
+    scripts: [testScript(), justScript()],
     preDefinedAdmins: PRE_DEFINED_ADMINS.split(",").map((id) => Number(id)),
   },
   {},

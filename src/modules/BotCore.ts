@@ -140,6 +140,7 @@ export class BotCore implements IBotCore {
   bindEntryPoints(bot: Telegraf<Context<Update>>): IBotCore {
     for (const script of this._scripts) {
       const { command, cb } = script.entryPoint;
+      logger.info(`Bind entry command /${command} for script ${script.name}`);
       bot.command(command, async (context: Context) => {
         await cb(context, this);
         this.setSession(context.from.id, {
@@ -147,17 +148,20 @@ export class BotCore implements IBotCore {
           stage: script.getFirstStage(),
         });
       });
-      logger.info(`Binding ${command}->${script.name}`);
+      logger.info(
+        `Complete bind point for ${script.name}, points list: [${script.flowKeys.join(",")}]`,
+      );
     }
 
     return this;
   }
 
   flushStage(telegramId: number): void {
-    this._sessions[telegramId] = {
+    const { lastMessage } = this.getSession(telegramId);
+    this.setSession(telegramId, {
       stage: "",
-      lastMessage: "",
-    };
+      lastMessage,
+    });
   }
 
   getSession(telegramId: number): SessionItem {
@@ -175,7 +179,7 @@ export class BotCore implements IBotCore {
     const { stage } = this.getSession(fromId);
     const script = this._flowKeyToScriptMap[stage];
 
-    if (!Object.hasOwn(script, "execute")) {
+    if (!script) {
       await noScriptCb(context, this);
       return;
     }
@@ -186,7 +190,7 @@ export class BotCore implements IBotCore {
     } catch (err) {
       logger.error(`Error while execution stage '${stage}' script, reason:`);
       logger.error(err.message);
-      // this.flushStage(fromId);
+      this.flushStage(fromId);
       await onErr(context, this);
       return;
     }

@@ -66,12 +66,19 @@ export class Scriptor implements IScriptor {
   async execute(context: Context<Update>, core: IBotCore) {
     const { stage } = core.getSession(context.from.id);
     const { handler } = this._keyToHandleMap[stage];
+    const stageIndex = Number(stage.split("_")[stage.split("_").length - 1]);
+    const isLastStage = stageIndex >= this._flowKeys.length;
+
+    logger.info(`[Scriptor] Processing script: ${this.name}, stage: ${stage}`);
     await handler(context, core);
 
-    const currentStageIndex = Number(stage.split("_")[1]);
+    if (isLastStage) {
+      core.flushStage(context.from.id);
+      return;
+    }
 
     core.setSession(context.from.id, {
-      stage: `${this._name}_${currentStageIndex + 1}`,
+      stage: `${this._name}_${stageIndex + 1}`,
       lastMessage: context.text,
     });
   }
