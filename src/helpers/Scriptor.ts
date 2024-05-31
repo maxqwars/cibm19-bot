@@ -1,15 +1,15 @@
 import { Context } from "telegraf";
-import { BotCore, CoreContextType } from "../modules/BotCore";
+import { IBotCore } from "../modules/BotCore";
 import { Update } from "telegraf/typings/core/types/typegram";
 import logger from "../logger";
 
 type EntryPointType = {
   command: string;
-  cb: { (context: Context, core: BotCore): Promise<void> };
+  cb: { (context: Context, core: IBotCore): Promise<void> };
 };
 
 type StageHandlerType = {
-  (context: Context, core: BotCore): Promise<void>;
+  (context: Context, core: IBotCore): Promise<void>;
 };
 
 type KeyToHandlerMapItemType = {
@@ -24,14 +24,10 @@ type ScriptorOptionsType = {
 interface IScriptor {
   flowKeys: string[];
   addStage(handler: StageHandlerType): IScriptor;
-  execute(
-    key: string,
-    context: Context<Update>,
-    coreContext: CoreContextType,
-    core: BotCore,
-  ): Promise<void>;
+  execute(context: Context<Update>, core: IBotCore): Promise<void>;
   entryPoint: EntryPointType;
   name: string;
+  getFirstStage(): string;
 }
 
 interface IScriptorConstructable {
@@ -63,20 +59,21 @@ export class Scriptor implements IScriptor {
     return this._name;
   }
 
-  async execute(
-    key: string,
-    context: Context<Update>,
-    coreContext: CoreContextType,
-    core: BotCore,
-  ): Promise<void> {
-    logger.info(`Scriptor: Execution "${key}"...`);
+  getFirstStage(): string {
+    return this.flowKeys[0];
+  }
 
-    try {
-      const { handler } = this._keyToHandleMap[key];
-      await handler(context, core);
-    } catch (err) {
-      return null;
-    }
+  async execute(context: Context<Update>, core: IBotCore) {
+    const { stage } = core.getSession(context.from.id);
+    const { handler } = this._keyToHandleMap[stage];
+    await handler(context, core);
+
+    const currentStageIndex = Number(stage.split("_")[1]);
+
+    core.setSession(context.from.id, {
+      stage: `${this._name}_${currentStageIndex + 1}`,
+      lastMessage: context.text,
+    });
   }
 
   addStage(handler: StageHandlerType): IScriptor {

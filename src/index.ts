@@ -29,9 +29,23 @@ const core = new BotCore(
 const bot = new Telegraf(TELEGRAM_BOT_TOKEN);
 
 core
+  .init(bot)
+  .addMiddleware(bot, async (ctx, core) => {
+    console.log(
+      `Processing request from ${ctx.from.username}, stage: ${core.getSession(ctx.from.id).stage}`,
+    );
+  })
   .generateFlowToScriptMap()
   .bindEntryPoints(bot)
-  .bindOnMessageEvent(bot)
+  .bindOnMessageEvent(
+    bot,
+    async (ctx, core) => {
+      ctx.reply(`no script`);
+    },
+    async (ctx, core) => {
+      ctx.reply(`Error while execution`);
+    },
+  )
   .bindOnCallbackQueryEvent(bot);
 
 async function runInDevelopment() {

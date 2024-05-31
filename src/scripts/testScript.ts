@@ -12,23 +12,23 @@ export default function () {
   });
 
   testScript.addStage(async (context, core) => {
-    context.reply(`Continue seq...`);
+    context.reply(`Continue seq... 1`);
   });
 
   testScript.addStage(async (context, core) => {
-    context.reply(`Continue seq...`);
+    context.reply(`Continue seq... 2`);
   });
 
   testScript.addStage(async (context, core) => {
-    context.reply(`Continue seq...`);
+    context.reply(`Continue seq... 3`);
   });
 
   testScript.addStage(async (context, core) => {
-    context.reply(`Continue seq...`);
+    context.reply(`Continue seq... 4`);
   });
 
   testScript.addStage(async (context, core) => {
-    context.reply(`Continue seq...`);
+    context.reply(`Continue seq... 5`);
   });
 
   return testScript;
