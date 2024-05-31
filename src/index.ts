@@ -1,12 +1,16 @@
 import { config } from "dotenv";
 import { PrismaClient } from "@prisma/client";
 import memjs from "memjs";
-import { env } from "node:process";
+import { env, cwd } from "node:process";
+import { join } from "node:path";
 import { BotCore } from "./modules/BotCore";
 import logger from "./logger";
 import { Telegraf } from "telegraf";
 import testScript from "./scripts/testScript";
 import justScript from "./scripts/justCommand";
+
+import { Render } from "./components/Render";
+import { Cache } from "./components/Cache";
 
 config();
 
@@ -18,6 +22,8 @@ const MEMCACHED_HOSTS = env["MEMCACHED_HOSTS"];
 
 const prisma = new PrismaClient();
 const memClient = memjs.Client.create(MEMCACHED_HOSTS, {});
+const cache = new Cache(memClient);
+const render = new Render(join(cwd(), "./src/views"), cache);
 
 const core = new BotCore(
   {
@@ -28,6 +34,14 @@ const core = new BotCore(
     {
       name: "test_function_component",
       component: () => {},
+    },
+    {
+      name: "cache",
+      component: cache,
+    },
+    {
+      name: "render",
+      component: render,
     },
   ],
 );
