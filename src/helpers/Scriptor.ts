@@ -31,7 +31,7 @@ interface IScriptor {
 }
 
 interface IScriptorConstructable {
-  new(options: ScriptorOptionsType): IScriptor;
+  new (options: ScriptorOptionsType): IScriptor;
 }
 
 export class Scriptor implements IScriptor {
@@ -73,10 +73,14 @@ export class Scriptor implements IScriptor {
     await handler(context, core);
 
     if (isLastStage) {
+      logger.info(`[Scriptor] Script ${this.name} is end, flush session...`);
       core.flushStage(context.from.id);
       return;
     }
 
+    logger.info(
+      `[Scriptor] Set next stage for script ${this.name}: ${stage}->${this._name}_${stageIndex + 1}`,
+    );
     core.setSession(context.from.id, {
       stage: `${this._name}_${stageIndex + 1}`,
       lastMessage: context.text,
@@ -84,17 +88,17 @@ export class Scriptor implements IScriptor {
   }
 
   addStage(handler: StageHandlerType): IScriptor {
-    const key =
+    const stage =
       this._stages.length === 0
         ? `${this._name}_1`
         : `${this._name}_${this._stages.length + 1}`;
 
-    this._keyToHandleMap[key] = {
+    this._keyToHandleMap[stage] = {
       handler,
     };
 
-    this._stages.push(key);
-
+    logger.info(`[Scriptor] Added new stage ${stage} to script ${this.name}`);
+    this._stages.push(stage);
     return this;
   }
 }
