@@ -28,8 +28,8 @@ interface IBotCoreConstructable {
 }
 
 export interface IBotCore {
-  generateFlowToScriptMap(): IBotCore;
-  bindEntryPoints(bot: Telegraf<Context<Update>>): IBotCore;
+  generateStageToScriptorMap(): IBotCore;
+  bindScriptsCommands(bot: Telegraf<Context<Update>>): IBotCore;
   bindOnMessageEvent(
     bot: Telegraf<Context<Update>>,
     noScriptCb: OnProblemFunctionType,
@@ -137,7 +137,7 @@ export class BotCore implements IBotCore {
     return this;
   }
 
-  bindEntryPoints(bot: Telegraf<Context<Update>>): IBotCore {
+  bindScriptsCommands(bot: Telegraf<Context<Update>>): IBotCore {
     for (const script of this._scripts) {
       const { command, cb } = script.entryPoint;
       logger.info(`Bind entry command /${command} for script ${script.name}`);
@@ -149,7 +149,7 @@ export class BotCore implements IBotCore {
         });
       });
       logger.info(
-        `Complete bind point for ${script.name}, points list: [${script.flowKeys.join(",")}]`,
+        `Complete bind point for ${script.name}, points list: [${script.stages.join(",")}]`,
       );
     }
 
@@ -200,11 +200,11 @@ export class BotCore implements IBotCore {
     throw new Error("Method not implemented.");
   }
 
-  generateFlowToScriptMap(): IBotCore {
+  generateStageToScriptorMap(): IBotCore {
     for (const script of this._scripts) {
-      for (const key of script.flowKeys) {
-        this._flowKeyToScriptMap[key] = script;
-        logger.info(`Added ${key}->${script.name}`);
+      for (const stage of script.stages) {
+        this._flowKeyToScriptMap[stage] = script;
+        logger.info(`Added ${stage}->${script.name}`);
       }
       logger.info(`Complete binding handlers for ${script.name}`);
     }

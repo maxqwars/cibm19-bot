@@ -22,7 +22,7 @@ type ScriptorOptionsType = {
 };
 
 interface IScriptor {
-  flowKeys: string[];
+  stages: string[];
   addStage(handler: StageHandlerType): IScriptor;
   execute(context: Context<Update>, core: IBotCore): Promise<void>;
   entryPoint: EntryPointType;
@@ -31,24 +31,24 @@ interface IScriptor {
 }
 
 interface IScriptorConstructable {
-  new (options: ScriptorOptionsType): IScriptor;
+  new(options: ScriptorOptionsType): IScriptor;
 }
 
 export class Scriptor implements IScriptor {
   private readonly _name: string;
-  private readonly _flowKeys: string[];
+  private readonly _stages: string[];
   private readonly _entryPoint: EntryPointType;
   private _keyToHandleMap: { [key: string]: KeyToHandlerMapItemType };
 
   constructor(options: ScriptorOptionsType) {
     this._name = options.name;
-    this._flowKeys = [];
+    this._stages = [];
     this._entryPoint = options.entryPoint;
     this._keyToHandleMap = {};
   }
 
-  get flowKeys() {
-    return this._flowKeys;
+  get stages() {
+    return this._stages;
   }
 
   get entryPoint() {
@@ -60,14 +60,14 @@ export class Scriptor implements IScriptor {
   }
 
   getFirstStage(): string {
-    return this.flowKeys[0];
+    return this.stages[0];
   }
 
   async execute(context: Context<Update>, core: IBotCore) {
     const { stage } = core.getSession(context.from.id);
     const { handler } = this._keyToHandleMap[stage];
     const stageIndex = Number(stage.split("_")[stage.split("_").length - 1]);
-    const isLastStage = stageIndex >= this._flowKeys.length;
+    const isLastStage = stageIndex >= this._stages.length;
 
     logger.info(`[Scriptor] Processing script: ${this.name}, stage: ${stage}`);
     await handler(context, core);
@@ -85,15 +85,15 @@ export class Scriptor implements IScriptor {
 
   addStage(handler: StageHandlerType): IScriptor {
     const key =
-      this._flowKeys.length === 0
+      this._stages.length === 0
         ? `${this._name}_1`
-        : `${this._name}_${this._flowKeys.length + 1}`;
+        : `${this._name}_${this._stages.length + 1}`;
 
     this._keyToHandleMap[key] = {
       handler,
     };
 
-    this._flowKeys.push(key);
+    this._stages.push(key);
 
     return this;
   }

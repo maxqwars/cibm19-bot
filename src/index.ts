@@ -36,8 +36,8 @@ core
       `Processing request from ${ctx.from.username}, stage: ${core.getSession(ctx.from.id).stage}`,
     );
   })
-  .generateFlowToScriptMap()
-  .bindEntryPoints(bot)
+  .generateStageToScriptorMap()
+  .bindScriptsCommands(bot)
   .bindOnMessageEvent(
     bot,
     async (ctx, core) => {
