@@ -1,5 +1,5 @@
 import { config } from "dotenv";
-import { PrismaClient } from "@prisma/client";
+import { $Enums, PrismaClient } from "@prisma/client";
 import memjs from "memjs";
 import { env, cwd } from "node:process";
 import { join } from "node:path";
@@ -15,6 +15,7 @@ import helpCommand from "./scripts/helpCommand";
 import { Render } from "./components/Render";
 import { Cache } from "./components/Cache";
 import { Cryptography } from "./components/Cryptography";
+import { Volonteers } from "./components/Volonteers";
 
 config();
 
@@ -29,12 +30,13 @@ const memClient = memjs.Client.create(MEMCACHED_HOSTS, {});
 const cache = new Cache(memClient);
 const render = new Render(join(cwd(), "./src/views"), cache);
 const cryptography = new Cryptography(DATA_ENCRYPTION_KEY, cache);
+const volonteers = new Volonteers(prisma);
 
 const core = new BotCore(
   {
     scripts: [testScript(), justScript(), cbQueryDebug(), helpCommand],
     preDefinedAdmins: PRE_DEFINED_ADMINS.split(",").map((id) => Number(id)),
-    callbacks: [testQueryCallback, testQueryCallback, testQueryCallback],
+    callbacks: [testQueryCallback],
   },
   [
     {
@@ -49,6 +51,10 @@ const core = new BotCore(
       name: "render",
       component: render,
     },
+    {
+      name: "volonteers",
+      component: volonteers,
+    },
   ],
 );
 
@@ -60,6 +66,30 @@ core
     logger.info(
       `[Message logging] @${ctx.from.username}, <${ctx.text}>, stage <${core.getSession(ctx.from.id).stage}>`,
     );
+  })
+  .addMiddleware(bot, async (ctx, core) => {
+    const volonteers = core.getModule("volonteers") as Volonteers;
+    const candidate = await volonteers.findVolonteerUnderTelegramId(
+      ctx.from.id,
+    );
+
+    if (!candidate) {
+      const predefinedIds = PRE_DEFINED_ADMINS.split(",").map((str) =>
+        Number(str),
+      );
+
+      await volonteers.createWithData({
+        fio: "",
+        telegramId: ctx.from.id,
+        telegramUsername: `${ctx.from.username}`,
+        telegramName: `${ctx.from.first_name} ${ctx.from.last_name}`,
+        role: predefinedIds.find((id) => id === ctx.from.id)
+          ? $Enums.ROLE.ADMIN
+          : null,
+      });
+    }
+
+    return;
   })
   .generateStageToScriptorMap()
   .bindScriptsCommands(bot)

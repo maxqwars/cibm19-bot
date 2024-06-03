@@ -7,56 +7,49 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model Organization {
-    id         Int      @id @default(autoincrement())
-    name       String   @unique
-    nameHash   String   @unique
-    createdAt  DateTime @default(now())
-    updatedtAt DateTime @default(now())
-    closed     Boolean  @default(false)
-
-    // Relations
-    members Volonteer[]
-    Claim   Claim[]
+enum ROLE {
+    ADMIN
+    CURATOR
+    VOLONTEER
 }
 
 model Volonteer {
-    id                 Int      @id @default(autoincrement())
-    role               String
-    createdAt          DateTime @default(now())
-    updatedtAt         DateTime @default(now())
-    name               String
-    telegramId         BigInt   @unique
-    telegramUsername   String
-    telegramName       String
-    flowNextHandlerKey String
-    latestMessage      String
-    balance            Int      @default(0)
+    id   Int    @id @default(autoincrement())
+    fio  String
+    role ROLE?
 
-    // Relations
+    telegramId       BigInt @unique
+    telegramName     String
+    telegramUsername String @unique
+    balance          Int
+
+    createdAt      DateTime      @default(now())
+    updatedtAt     DateTime      @default(now())
+    reports        Report[]
     Organization   Organization? @relation(fields: [organizationId], references: [id])
     organizationId Int?
-    Report         Report[]
-    Claim          Claim[]
+    claims         Claim[]
 }
 
 model Report {
-    id        Int      @id @default(autoincrement())
-    createdAt DateTime @default(now())
-    payload   String
-    hash      String
-    confirmed Boolean  @default(false)
-
-    // Relations
+    id          Int       @id @default(autoincrement())
+    payload     String
+    hash        String
+    confirmed   Boolean   @default(false)
     volonteer   Volonteer @relation(fields: [volonteerId], references: [id])
     volonteerId Int
 }
 
-model Claim {
-    id        Int      @id @default(autoincrement())
-    createdAt DateTime @default(now())
+model Organization {
+    id      Int         @id @default(autoincrement())
+    name    String
+    domain  String      @unique
+    members Volonteer[]
+    claims  Claim[]
+}
 
-    // Relations
+model Claim {
+    id             Int          @id @default(autoincrement())
     volonteer      Volonteer    @relation(fields: [volonteerId], references: [id])
     organization   Organization @relation(fields: [organizationId], references: [id])
     volonteerId    Int
