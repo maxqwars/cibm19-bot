@@ -6,7 +6,7 @@ import logger from "../logger";
 const MOD_NAME = "[Impact]";
 
 type QueryCallbackType = {
-  (context: Context, core: IBotCore): Promise<void>;
+  (context: Context<Update.CallbackQueryUpdate>, core: IBotCore): Promise<void>;
 };
 
 type ImpactOptionsType = {
@@ -15,10 +15,10 @@ type ImpactOptionsType = {
   callback: QueryCallbackType;
 };
 
-interface IImpactSonstructable {
+export interface IImpactSonstructable {
   new (options: ImpactOptionsType): IImpact;
 }
 
-interface IImpact {}
+export interface IImpact {}
 
 export default class Impact implements IImpact {}
