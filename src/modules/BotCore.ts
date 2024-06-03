@@ -148,7 +148,10 @@ export class BotCore implements IBotCore {
   }
 
   bindOnCallbackQueryEvent(bot: Telegraf<Context<Update>>): IBotCore {
-    bot.on("callback_query", (context) => this.callbackQuery(context));
+    bot.on(
+      "callback_query",
+      async (context) => await this.callbackQuery(context),
+    );
     return this;
   }
 
@@ -221,19 +224,31 @@ export class BotCore implements IBotCore {
     context: Context<Update.CallbackQueryUpdate>,
   ): Promise<void> {
     const { data } = context.update.callback_query as CallbackQuery.DataQuery;
+
     logger.info(
-      `[BotCore] Incoming callback query from ${context.from.id}, with data <${data}>`,
+      `[BotCore.callbackQuery] Incoming callback query from ${context.from.id}, with data <${data}>`,
     );
 
-    const queryCallback = this._callbacks.find((callback) => {
-      return data.match(callback.signature);
-    });
+    const lambda = this._callbacks.find((lambda) =>
+      lambda.signature.test(data),
+    );
 
-    if (!queryCallback) {
+    if (!lambda) {
+      context.telegram.deleteMessage(context.chat.id, context.msgId);
+      logger.error(`[BotCore.callbackQuery] Callback for <${data}> not found`);
       return;
     }
 
-    await queryCallback.callback(context, this);
+    try {
+      await lambda.callback(context, this);
+    } catch (err) {
+      context.telegram.deleteMessage(context.chat.id, context.msgId);
+      logger.error(
+        `[BotCore.callbackQuery] Error while processing query <${data}>, reason:`,
+      );
+      logger.error(err.message);
+      return;
+    }
 
     return;
   }

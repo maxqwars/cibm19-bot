@@ -9,6 +9,7 @@ import { Telegraf } from "telegraf";
 import testScript from "./scripts/testScript";
 import justScript from "./scripts/justCommand";
 import cbQueryDebug from "./scripts/cbQueryDebug";
+import testQueryCallback from "./lambdas/testQueryCallback";
 
 import { Render } from "./components/Render";
 import { Cache } from "./components/Cache";
@@ -32,7 +33,7 @@ const core = new BotCore(
   {
     scripts: [testScript(), justScript(), cbQueryDebug()],
     preDefinedAdmins: PRE_DEFINED_ADMINS.split(",").map((id) => Number(id)),
-    callbacks: [],
+    callbacks: [testQueryCallback, testQueryCallback, testQueryCallback],
   },
   [
     {

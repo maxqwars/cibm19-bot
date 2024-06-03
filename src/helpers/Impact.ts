@@ -25,26 +25,14 @@ export interface IImpact {
   callback: QueryCallbackType;
 }
 
-export default class Impact implements IImpact {
-  private readonly _signature: RegExp;
-  private readonly _name: string;
-  private readonly _callback: QueryCallbackType;
+export class Impact implements IImpact {
+  public readonly signature: RegExp;
+  public readonly name: string;
+  public readonly callback: QueryCallbackType;
 
   constructor(options: ImpactOptionsType) {
-    this._callback = options.callback;
-    this._signature = options.signature;
-    this._name = options.name;
-  }
-
-  get signature() {
-    return this.signature;
-  }
-
-  get name() {
-    return this._name;
-  }
-
-  get callback() {
-    return this._callback;
+    this.callback = options.callback;
+    this.signature = options.signature;
+    this.name = options.name;
   }
 }

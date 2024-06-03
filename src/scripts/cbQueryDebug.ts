@@ -10,8 +10,9 @@ export default function () {
         context.reply(
           `Its just command`,
           Markup.inlineKeyboard([
-            Markup.button.callback("✅", `accept_claim=${1}`),
-            Markup.button.callback("❌", `reject_claim=${1}`),
+            Markup.button.callback("✅", `test_query_success=${1}`),
+            Markup.button.callback("❌", `test_query_failure=${1}`),
+            Markup.button.callback("👌", `error=${1}`),
           ]),
         );
       },
