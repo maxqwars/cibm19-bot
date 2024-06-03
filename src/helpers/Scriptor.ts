@@ -21,7 +21,7 @@ type ScriptorOptionsType = {
   entryPoint: EntryPointType;
 };
 
-interface IScriptor {
+export interface IScriptor {
   stages: string[];
   addStage(handler: StageHandlerType): IScriptor;
   execute(context: Context<Update>, core: IBotCore): Promise<void>;
@@ -30,7 +30,7 @@ interface IScriptor {
   getFirstStage(): string;
 }
 
-interface IScriptorConstructable {
+export interface IScriptorConstructable {
   new (options: ScriptorOptionsType): IScriptor;
 }
 

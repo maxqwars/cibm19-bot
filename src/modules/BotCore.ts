@@ -1,5 +1,6 @@
 import { Context, Telegraf } from "telegraf";
-import { Scriptor } from "../helpers/Scriptor";
+import { Scriptor, IScriptor } from "../helpers/Scriptor";
+import { IImpact } from "../helpers/Impact";
 import { Update } from "telegraf/typings/core/types/typegram";
 import logger from "../logger";
 
@@ -60,12 +61,13 @@ export interface IBotCore {
 }
 
 export class BotCore implements IBotCore {
-  private readonly _scripts: Scriptor[];
+  private readonly _scripts: IScriptor[];
+  private readonly _callbacks: IImpact[];
   private readonly _preDefinedAdmins: number[];
   private readonly _sessions: { [key: number]: SessionItem };
 
   private _components: { [key: string]: any };
-  private _flowKeyToScriptMap: { [key: string]: Scriptor };
+  private _flowKeyToScriptMap: { [key: string]: IScriptor };
 
   constructor(options: CoreOptionsType, components: CoreComponentsType[]) {
     this._scripts = options.scripts;
