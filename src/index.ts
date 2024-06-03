@@ -10,6 +10,7 @@ import testScript from "./scripts/testScript";
 import justScript from "./scripts/justCommand";
 import cbQueryDebug from "./scripts/cbQueryDebug";
 import testQueryCallback from "./lambdas/testQueryCallback";
+import helpCommand from "./scripts/helpCommand";
 
 import { Render } from "./components/Render";
 import { Cache } from "./components/Cache";
@@ -31,7 +32,7 @@ const cryptography = new Cryptography(DATA_ENCRYPTION_KEY, cache);
 
 const core = new BotCore(
   {
-    scripts: [testScript(), justScript(), cbQueryDebug()],
+    scripts: [testScript(), justScript(), cbQueryDebug(), helpCommand],
     preDefinedAdmins: PRE_DEFINED_ADMINS.split(",").map((id) => Number(id)),
     callbacks: [testQueryCallback, testQueryCallback, testQueryCallback],
   },
