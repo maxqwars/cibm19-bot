@@ -8,6 +8,7 @@ import logger from "./logger";
 import { Telegraf } from "telegraf";
 import testScript from "./scripts/testScript";
 import justScript from "./scripts/justCommand";
+import cbQueryDebug from "./scripts/cbQueryDebug";
 
 import { Render } from "./components/Render";
 import { Cache } from "./components/Cache";
@@ -29,8 +30,9 @@ const cryptography = new Cryptography(DATA_ENCRYPTION_KEY, cache);
 
 const core = new BotCore(
   {
-    scripts: [testScript(), justScript()],
+    scripts: [testScript(), justScript(), cbQueryDebug()],
     preDefinedAdmins: PRE_DEFINED_ADMINS.split(",").map((id) => Number(id)),
+    callbacks: [],
   },
   [
     {
@@ -53,8 +55,8 @@ const bot = new Telegraf(TELEGRAM_BOT_TOKEN);
 core
   .init(bot)
   .addMiddleware(bot, async (ctx, core) => {
-    console.log(
-      `Processing request from ${ctx.from.username}, stage: ${core.getSession(ctx.from.id).stage}`,
+    logger.info(
+      `[Message logging] @${ctx.from.username}, <${ctx.text}>, stage <${core.getSession(ctx.from.id).stage}>`,
     );
   })
   .generateStageToScriptorMap()

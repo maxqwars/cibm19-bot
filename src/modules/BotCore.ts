@@ -1,7 +1,7 @@
 import { Context, Telegraf } from "telegraf";
-import { Scriptor, IScriptor } from "../helpers/Scriptor";
+import { IScriptor } from "../helpers/Scriptor";
 import { IImpact } from "../helpers/Impact";
-import { Update } from "telegraf/typings/core/types/typegram";
+import { CallbackQuery, Update } from "telegraf/typings/core/types/typegram";
 import logger from "../logger";
 
 type CoreComponentsType = {
@@ -11,7 +11,8 @@ type CoreComponentsType = {
 
 type CoreOptionsType = {
   preDefinedAdmins: number[];
-  scripts: Scriptor[];
+  scripts: IScriptor[];
+  callbacks: IImpact[];
 };
 
 type MiddlewareFunctionType = {
@@ -45,7 +46,7 @@ export interface IBotCore {
     noScriptCb: OnProblemFunctionType,
     onErr: OnProblemFunctionType,
   ): Promise<void>;
-  callbackQuery(context: Context): Promise<void>;
+  callbackQuery(context: Context<Update.CallbackQueryUpdate>): Promise<void>;
   flushStage(telegramId: number): void;
   getSession(telegramId: number): SessionItem;
   addModule<T>(name: string, instance: T): IBotCore;
@@ -75,6 +76,7 @@ export class BotCore implements IBotCore {
     this._flowKeyToScriptMap = {};
     this._sessions = {};
     this._components = {};
+    this._callbacks = options.callbacks;
 
     for (const cmp in components) {
       const { name, component } = components[cmp];
@@ -86,7 +88,7 @@ export class BotCore implements IBotCore {
 
   setSession(telegramId: number, session: SessionItem): SessionItem {
     logger.info(
-      `Update session variables for ${telegramId}. stage: ${session.stage}, lastMessage: ${session.lastMessage}`,
+      `[BotCore] Update session variables for <${telegramId}> stage: <${session.stage}> lastMessage: <${session.lastMessage}>`,
     );
     this._sessions[telegramId] = session;
     return session;
@@ -215,8 +217,25 @@ export class BotCore implements IBotCore {
     }
   }
 
-  callbackQuery(context: Context<Update>): Promise<void> {
-    throw new Error("Method not implemented.");
+  async callbackQuery(
+    context: Context<Update.CallbackQueryUpdate>,
+  ): Promise<void> {
+    const { data } = context.update.callback_query as CallbackQuery.DataQuery;
+    logger.info(
+      `[BotCore] Incoming callback query from ${context.from.id}, with data <${data}>`,
+    );
+
+    const queryCallback = this._callbacks.find((callback) => {
+      return data.match(callback.signature);
+    });
+
+    if (!queryCallback) {
+      return;
+    }
+
+    await queryCallback.callback(context, this);
+
+    return;
   }
 
   generateStageToScriptorMap(): IBotCore {
