@@ -81,7 +81,7 @@ export class BotCore implements IBotCore {
     for (const cmp in components) {
       const { name, component } = components[cmp];
 
-      logger.info(`[BotCore] Registered component ${name}...`);
+      logger.info(`[BotCore] Registered component <${name}>`);
       this.components[name] = component;
     }
   }

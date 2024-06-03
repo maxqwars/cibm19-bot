@@ -1,5 +1,6 @@
 import { Cache } from "./Cache";
 import crypto from "node:crypto";
+import logger from "../logger";
 
 export class Cryptography {
   private readonly _algorithm = "aes-256-cbc";
@@ -13,7 +14,9 @@ export class Cryptography {
     this._key = Buffer.from(key, "utf8");
     this._iv = crypto.randomBytes(16);
 
-    console.log(`Buffer length`, this._key.length);
+    logger.info(
+      `[Cryptography.constructor] Encryption key length ${this._key.length}`,
+    );
   }
 
   encrypt(val: string) {
