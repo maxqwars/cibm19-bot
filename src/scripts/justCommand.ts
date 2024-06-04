@@ -7,6 +7,7 @@ export default function () {
       command: "just",
       async cb(context, core) {
         context.reply(`Its just command`);
+        return true;
       },
     },
   });

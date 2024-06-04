@@ -15,6 +15,8 @@ export default function () {
             Markup.button.callback("👌", `error=${1}`),
           ]),
         );
+
+        return true;
       },
     },
   });

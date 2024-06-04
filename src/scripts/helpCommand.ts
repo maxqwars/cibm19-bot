@@ -9,7 +9,7 @@ export default new Scriptor({
       const render = core.getModule("render") as Render;
       const replyContent = await render.render("common_help.txt", {});
       context.reply(replyContent);
-      return;
+      return true;
     },
   },
 });
