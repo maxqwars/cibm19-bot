@@ -34,7 +34,7 @@ export default function () {
 
   testScript.addStage(async (context, core) => {
     context.reply(`Continue seq... 5`);
-    return true
+    return true;
   });
 
   return testScript;

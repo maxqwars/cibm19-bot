@@ -85,7 +85,7 @@ export class Scriptor implements IScriptor {
     logger.info(
       `[Scriptor] Set next stage for script ${this.name}: ${stage}->${this._name}_${stageIndex + 1}`,
     );
-    
+
     core.setSession(context.from.id, {
       stage: `${this._name}_${stageIndex + 1}`,
       lastMessage: context.text,
