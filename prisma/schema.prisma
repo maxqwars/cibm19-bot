@@ -22,6 +22,7 @@ model Volonteer {
     telegramName     String
     telegramUsername String @unique
     balance          Int
+    isAdult Boolean @default(false)
 
     createdAt      DateTime      @default(now())
     updatedtAt     DateTime      @default(now())
