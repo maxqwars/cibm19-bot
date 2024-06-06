@@ -50,10 +50,10 @@ export const claimsCommand = new Scriptor({
       const claimsArr = await claims.organizationClaims(organizationId);
 
       if (!claimsArr.length) {
-        const replyMessage = await render.render('no-claims.txt', {})
-        context.reply(replyMessage)
+        const replyMessage = await render.render("no-claims.txt", {});
+        context.reply(replyMessage);
         return true;
-    }
+      }
 
       for (const claim of claimsArr) {
         const claimInitiatorData = await volonteers.findVolonteerUnderId(
@@ -82,39 +82,39 @@ export const claimsCommand = new Scriptor({
 });
 
 claimsCommand.addStage(async (context, core) => {
-    const claims = core.getModule('claims') as Claims
-    const render = core.getModule('render') as Render
-    const volonteers = core.getModule('volonteers') as Volonteers
+  const claims = core.getModule("claims") as Claims;
+  const render = core.getModule("render") as Render;
+  const volonteers = core.getModule("volonteers") as Volonteers;
 
-    const organizationId = Number(context.text)
-    const claimsArr = await claims.organizationClaims(organizationId)
+  const organizationId = Number(context.text);
+  const claimsArr = await claims.organizationClaims(organizationId);
 
-    if (!claimsArr.length) {
-        const replyMessage = await render.render('no-claims.txt', {})
-        context.reply(replyMessage)
-        return true;
-    }
-
-    for (const claim of claimsArr) {
-        const claimInitiatorData = await volonteers.findVolonteerUnderId(
-          claim.volonteerId,
-        );
-
-        const messagePayload = await render.render("claim-preview.txt", {
-          telegramUsername: claimInitiatorData.telegramUsername,
-          volonteerFio: claimInitiatorData.fio,
-          telegramName: claimInitiatorData.telegramName,
-        });
-
-        context.telegram.sendMessage(
-          context.chat.id,
-          messagePayload,
-          Markup.inlineKeyboard([
-            Markup.button.callback("✅", `accept_claim=${claim.id}`),
-            Markup.button.callback("❌", `reject_claim=${claim.id}`),
-          ]),
-        );
-      }
-
+  if (!claimsArr.length) {
+    const replyMessage = await render.render("no-claims.txt", {});
+    context.reply(replyMessage);
     return true;
-})
+  }
+
+  for (const claim of claimsArr) {
+    const claimInitiatorData = await volonteers.findVolonteerUnderId(
+      claim.volonteerId,
+    );
+
+    const messagePayload = await render.render("claim-preview.txt", {
+      telegramUsername: claimInitiatorData.telegramUsername,
+      volonteerFio: claimInitiatorData.fio,
+      telegramName: claimInitiatorData.telegramName,
+    });
+
+    context.telegram.sendMessage(
+      context.chat.id,
+      messagePayload,
+      Markup.inlineKeyboard([
+        Markup.button.callback("✅", `accept_claim=${claim.id}`),
+        Markup.button.callback("❌", `reject_claim=${claim.id}`),
+      ]),
+    );
+  }
+
+  return true;
+});
