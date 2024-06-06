@@ -24,6 +24,7 @@ import { Cache } from "./components/Cache";
 import { Cryptography } from "./components/Cryptography";
 import { Volonteers } from "./components/Volonteers";
 import { Organizations } from "./components/Organizations";
+import { Claims } from './components/Claims'
 
 import { calcMd5 } from "./functions/calcMd5";
 
@@ -79,6 +80,10 @@ const core = new BotCore(
       name: "calculateMd5",
       component: calcMd5,
     },
+    {
+      name: 'claims',
+      component: Claims
+    }
   ],
 );
 
