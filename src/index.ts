@@ -16,6 +16,7 @@ import testQueryCallback from "./lambdas/testQueryCallback";
 // Import scripts
 import helpCommand from "./scripts/helpCommand";
 import createOrganizationScript from "./scripts/createOrganization";
+import { viewOrganizationsCommand } from "./scripts/viewOrganizationsCommand";
 
 // Import additionals components
 import { Render } from "./components/Render";
@@ -49,7 +50,7 @@ const organizations = new Organizations(prisma);
 // Create blaze-bot
 const core = new BotCore(
   {
-    scripts: [helpCommand, createOrganizationScript],
+    scripts: [helpCommand, createOrganizationScript, viewOrganizationsCommand],
     preDefinedAdmins: PRE_DEFINED_ADMINS.split(",").map((id) => Number(id)),
     callbacks: [testQueryCallback],
   },
