@@ -47,7 +47,7 @@ export const claimsCommand = new Scriptor({
       }
 
       const { organizationId } = await volonteers.memberOf(volonteer.id);
-      const claimsArr = await claims.organizationClaims(organizationId);
+      const claimsArr = await claims.organizationsClaims(organizationId);
 
       if (!claimsArr.length) {
         const replyMessage = await render.render("no-claims.txt", {});
