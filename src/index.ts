@@ -11,7 +11,7 @@ import logger from "./logger";
 import { Telegraf } from "telegraf";
 
 // import callback (for callbackQuery)
-import testQueryCallback from './lambdas/testQueryCallback'
+import testQueryCallback from "./lambdas/testQueryCallback";
 
 // Import scripts
 import testScript from "./scripts/testScript";
@@ -24,6 +24,7 @@ import { Render } from "./components/Render";
 import { Cache } from "./components/Cache";
 import { Cryptography } from "./components/Cryptography";
 import { Volonteers } from "./components/Volonteers";
+import { Organizations } from './components/Organizations'
 
 config();
 
@@ -43,6 +44,7 @@ const cache = new Cache(memClient);
 const render = new Render(join(cwd(), "./src/views"), cache);
 const cryptography = new Cryptography(DATA_ENCRYPTION_KEY, cache);
 const volonteers = new Volonteers(prisma);
+const organizations = new Organizations(prisma)
 
 // Create blaze-bot
 const core = new BotCore(
@@ -68,6 +70,10 @@ const core = new BotCore(
       name: "volonteers",
       component: volonteers,
     },
+    {
+      name: "organizations",
+      component: organizations
+    }
   ],
 );
 

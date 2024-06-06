@@ -1,58 +1,59 @@
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider = "postgresql"
-    url      = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 enum ROLE {
-    ADMIN
-    CURATOR
-    VOLONTEER
+  ADMIN
+  CURATOR
+  VOLONTEER
 }
 
 model Volonteer {
-    id   Int    @id @default(autoincrement())
-    fio  String
-    role ROLE?
+  id   Int    @id @default(autoincrement())
+  fio  String
+  role ROLE?
 
-    telegramId       BigInt @unique
-    telegramName     String
-    telegramUsername String @unique
-    balance          Int
-    isAdult Boolean @default(false)
+  telegramId       BigInt  @unique
+  telegramName     String
+  telegramUsername String  @unique
+  balance          Int
+  isAdult          Boolean @default(false)
 
-    createdAt      DateTime      @default(now())
-    updatedtAt     DateTime      @default(now())
-    reports        Report[]
-    Organization   Organization? @relation(fields: [organizationId], references: [id])
-    organizationId Int?
-    claims         Claim[]
+  createdAt      DateTime      @default(now())
+  updatedtAt     DateTime      @default(now())
+  reports        Report[]
+  Organization   Organization? @relation(fields: [organizationId], references: [id])
+  organizationId Int?
+  claims         Claim[]
 }
 
 model Report {
-    id          Int       @id @default(autoincrement())
-    payload     String
-    hash        String
-    confirmed   Boolean   @default(false)
-    volonteer   Volonteer @relation(fields: [volonteerId], references: [id])
-    volonteerId Int
+  id          Int       @id @default(autoincrement())
+  payload     String
+  hash        String
+  confirmed   Boolean   @default(false)
+  volonteer   Volonteer @relation(fields: [volonteerId], references: [id])
+  volonteerId Int
 }
 
 model Organization {
-    id      Int         @id @default(autoincrement())
-    name    String
-    domain  String      @unique
-    members Volonteer[]
-    claims  Claim[]
+  id      Int         @id @default(autoincrement())
+  name    String      @unique
+  domain  String      @unique
+  closed  Boolean     @default(false)
+  members Volonteer[]
+  claims  Claim[]
 }
 
 model Claim {
-    id             Int          @id @default(autoincrement())
-    volonteer      Volonteer    @relation(fields: [volonteerId], references: [id])
-    organization   Organization @relation(fields: [organizationId], references: [id])
-    volonteerId    Int
-    organizationId Int
+  id             Int          @id @default(autoincrement())
+  volonteer      Volonteer    @relation(fields: [volonteerId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  volonteerId    Int
+  organizationId Int
 }

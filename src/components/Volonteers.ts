@@ -58,4 +58,38 @@ export class Volonteers {
       return;
     }
   }
+
+  async updateVolonteerFio(id: number, fio: string) {
+    try {
+      return await this._client.volonteer.update({
+        where: {
+          id,
+        },
+        data: {
+          fio,
+        },
+      });
+    } catch (err) {
+      logger.error(`Failed update volonteer [${id}] fio  field, reason:`);
+      logger.error(err.message);
+      return;
+    }
+  }
+
+  async updateVolonteerRole(id: number, role: $Enums.ROLE) {
+    try {
+      return await this._client.volonteer.update({
+        where: {
+          id,
+        },
+        data: {
+          role,
+        },
+      });
+    } catch (err) {
+      logger.error(`Failed update volonteer [${id}] role field, reason:`);
+      logger.error(err.message);
+      return;
+    }
+  }
 }
