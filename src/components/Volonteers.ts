@@ -92,4 +92,15 @@ export class Volonteers {
       return;
     }
   }
+
+  async updateVolonteerAdultStatus(id: number, isAdult: boolean) {
+    return await this._client.volonteer.update({
+      where: {
+        id,
+      },
+      data: {
+        isAdult,
+      },
+    });
+  }
 }
