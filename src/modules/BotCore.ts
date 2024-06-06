@@ -158,9 +158,11 @@ export class BotCore implements IBotCore {
   bindScriptsCommands(bot: Telegraf<Context<Update>>): IBotCore {
     for (const script of this._scripts) {
       const { command, cb } = script.entryPoint;
+
       logger.info(
         `[BotCore.bindScriptsCommands] Bind command /${command} for script ${script.name}`,
       );
+
       bot.command(command, async (context: Context) => {
         await cb(context, this);
         this.setSession(context.from.id, {
@@ -168,6 +170,7 @@ export class BotCore implements IBotCore {
           stage: script.getFirstStage(),
         });
       });
+
       logger.info(
         `[BotCore.bindScriptsCommands] Complete bind point for ${script.name}, points list: [${script.stages.join(",")}]`,
       );
@@ -257,10 +260,12 @@ export class BotCore implements IBotCore {
     for (const script of this._scripts) {
       for (const stage of script.stages) {
         this._flowKeyToScriptMap[stage] = script;
+
         logger.info(
           `[BotCore.generateStageToScriptorMap] Add stage ${stage}->${script.name}`,
         );
       }
+
       logger.info(
         `[BotCore.generateStageToScriptorMap] Complete load stages for ${script.name}`,
       );
