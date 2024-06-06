@@ -1,17 +1,25 @@
+// Build-in node modules
+import { env, cwd } from "node:process";
+import { join } from "node:path";
+
+// Third party modules
 import { config } from "dotenv";
 import { $Enums, PrismaClient } from "@prisma/client";
 import memjs from "memjs";
-import { env, cwd } from "node:process";
-import { join } from "node:path";
 import { BotCore } from "./modules/BotCore";
 import logger from "./logger";
 import { Telegraf } from "telegraf";
+
+// import callback (for callbackQuery)
+import testQueryCallback from './lambdas/testQueryCallback'
+
+// Import scripts
 import testScript from "./scripts/testScript";
 import justScript from "./scripts/justCommand";
 import cbQueryDebug from "./scripts/cbQueryDebug";
-import testQueryCallback from "./lambdas/testQueryCallback";
 import helpCommand from "./scripts/helpCommand";
 
+// Import additionals components
 import { Render } from "./components/Render";
 import { Cache } from "./components/Cache";
 import { Cryptography } from "./components/Cryptography";
@@ -19,19 +27,24 @@ import { Volonteers } from "./components/Volonteers";
 
 config();
 
+/* Get environment variables */
 const TELEGRAM_BOT_TOKEN = env["TELEGRAM_BOT_TOKEN"];
 const PRE_DEFINED_ADMINS = env["PRE_DEFINED_ADMINS"];
 const DATA_ENCRYPTION_KEY = env["DATA_ENCRYPTION_KEY"];
 const MODE = env["MODE"] || "development";
 const MEMCACHED_HOSTS = env["MEMCACHED_HOSTS"];
 
+// Init external modules
 const prisma = new PrismaClient();
 const memClient = memjs.Client.create(MEMCACHED_HOSTS, {});
+
+// Init components
 const cache = new Cache(memClient);
 const render = new Render(join(cwd(), "./src/views"), cache);
 const cryptography = new Cryptography(DATA_ENCRYPTION_KEY, cache);
 const volonteers = new Volonteers(prisma);
 
+// Create blaze-bot
 const core = new BotCore(
   {
     scripts: [testScript(), justScript(), cbQueryDebug(), helpCommand],
@@ -58,8 +71,10 @@ const core = new BotCore(
   ],
 );
 
+// Create telegram bot
 const bot = new Telegraf(TELEGRAM_BOT_TOKEN);
 
+// Configure blaze-bot core
 core
   .init(bot)
   .addMiddleware(bot, async (ctx, core) => {
