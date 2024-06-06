@@ -49,6 +49,7 @@ const render = new Render(join(cwd(), "./src/views"), cache);
 const cryptography = new Cryptography(DATA_ENCRYPTION_KEY, cache);
 const volonteers = new Volonteers(prisma);
 const organizations = new Organizations(prisma);
+const claims = new Claims(prisma);
 
 const SCRIPTS = [
   helpCommand,
@@ -94,7 +95,7 @@ const core = new BotCore(
     },
     {
       name: "claims",
-      component: Claims,
+      component: claims,
     },
   ],
 );

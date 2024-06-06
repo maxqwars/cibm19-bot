@@ -40,6 +40,7 @@ export class Claims {
       where: {
         organizationId,
       },
+      skip: 0,
     });
   }
 }

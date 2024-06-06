@@ -5,8 +5,9 @@ import { Scriptor } from "../helpers/Scriptor";
 import { Render } from "../components/Render";
 import { Markup } from "telegraf";
 import { Organizations } from "../components/Organizations";
+import logger from "../logger";
 
-export const claimsCommand = new Scriptor({
+const claimsCommandConstruct = new Scriptor({
   name: "claims-command",
   entryPoint: {
     command: "claims",
@@ -47,7 +48,7 @@ export const claimsCommand = new Scriptor({
       }
 
       const { organizationId } = await volonteers.memberOf(volonteer.id);
-      const claimsArr = await claims.organizationsClaims(organizationId);
+      const claimsArr = await claims.organizationClaims(organizationId);
 
       if (!claimsArr.length) {
         const replyMessage = await render.render("no-claims.txt", {});
@@ -81,12 +82,16 @@ export const claimsCommand = new Scriptor({
   },
 });
 
-claimsCommand.addStage(async (context, core) => {
+claimsCommandConstruct.addStage(async (context, core) => {
   const claims = core.getModule("claims") as Claims;
   const render = core.getModule("render") as Render;
   const volonteers = core.getModule("volonteers") as Volonteers;
 
-  const organizationId = Number(context.text);
+  for (const method in claims) {
+    logger.info(method);
+  }
+
+  const organizationId = Number(context.text.trim());
   const claimsArr = await claims.organizationClaims(organizationId);
 
   if (!claimsArr.length) {
@@ -118,3 +123,5 @@ claimsCommand.addStage(async (context, core) => {
 
   return true;
 });
+
+export const claimsCommand = claimsCommandConstruct;
