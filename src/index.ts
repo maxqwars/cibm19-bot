@@ -14,17 +14,17 @@ import { Telegraf } from "telegraf";
 import testQueryCallback from "./lambdas/testQueryCallback";
 
 // Import scripts
-import testScript from "./scripts/testScript";
-import justScript from "./scripts/justCommand";
-import cbQueryDebug from "./scripts/cbQueryDebug";
 import helpCommand from "./scripts/helpCommand";
+import createOrganizationScript from "./scripts/createOrganization";
 
 // Import additionals components
 import { Render } from "./components/Render";
 import { Cache } from "./components/Cache";
 import { Cryptography } from "./components/Cryptography";
 import { Volonteers } from "./components/Volonteers";
-import { Organizations } from './components/Organizations'
+import { Organizations } from "./components/Organizations";
+
+import { calcMd5 } from "./functions/calcMd5";
 
 config();
 
@@ -44,12 +44,15 @@ const cache = new Cache(memClient);
 const render = new Render(join(cwd(), "./src/views"), cache);
 const cryptography = new Cryptography(DATA_ENCRYPTION_KEY, cache);
 const volonteers = new Volonteers(prisma);
-const organizations = new Organizations(prisma)
+const organizations = new Organizations(prisma);
 
 // Create blaze-bot
 const core = new BotCore(
   {
-    scripts: [testScript(), justScript(), cbQueryDebug(), helpCommand],
+    scripts: [
+      helpCommand,
+      createOrganizationScript,
+    ],
     preDefinedAdmins: PRE_DEFINED_ADMINS.split(",").map((id) => Number(id)),
     callbacks: [testQueryCallback],
   },
@@ -72,8 +75,12 @@ const core = new BotCore(
     },
     {
       name: "organizations",
-      component: organizations
-    }
+      component: organizations,
+    },
+    {
+      name: "calculateMd5",
+      component: calcMd5,
+    },
   ],
 );
 
