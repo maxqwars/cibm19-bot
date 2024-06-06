@@ -28,15 +28,15 @@ export class Organizations {
   async findById(id: number) {
     return await this._client.organization.findFirst({
       where: {
-        id
-      }
-    })
+        id,
+      },
+    });
   }
 
   async getAll() {
     return await this._client.organization.findMany({
-      skip: 0
-    })
+      skip: 0,
+    });
   }
 
   async getUnlocked() {
@@ -44,16 +44,16 @@ export class Organizations {
       where: {
         closed: false,
       },
-      skip: 0
-    })
+      skip: 0,
+    });
   }
 
   async getLocked() {
     return await this._client.organization.findMany({
       where: {
-        closed: true
+        closed: true,
       },
-      take: 0
-    })
+      take: 0,
+    });
   }
 }
