@@ -49,10 +49,7 @@ const organizations = new Organizations(prisma);
 // Create blaze-bot
 const core = new BotCore(
   {
-    scripts: [
-      helpCommand,
-      createOrganizationScript,
-    ],
+    scripts: [helpCommand, createOrganizationScript],
     preDefinedAdmins: PRE_DEFINED_ADMINS.split(",").map((id) => Number(id)),
     callbacks: [testQueryCallback],
   },
@@ -124,10 +121,17 @@ core
   .bindOnMessageEvent(
     bot,
     async (ctx, core) => {
-      ctx.reply(`no script`);
+      const render = core.getModule("render") as Render;
+      const contentMessage = await render.render("no-script-err.txt", {});
+      ctx.reply(contentMessage);
     },
     async (ctx, core) => {
-      ctx.reply(`Error while execution`);
+      const render = core.getModule("render") as Render;
+      const contentMessage = await render.render(
+        "error-while-script-proc.txt",
+        {},
+      );
+      ctx.reply(contentMessage);
     },
   )
   .bindOnCallbackQueryEvent(bot);
