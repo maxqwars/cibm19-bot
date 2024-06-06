@@ -17,6 +17,7 @@ import testQueryCallback from "./lambdas/testQueryCallback";
 import helpCommand from "./scripts/helpCommand";
 import createOrganizationScript from "./scripts/createOrganization";
 import { viewOrganizationsCommand } from "./scripts/viewOrganizationsCommand";
+import { registerVolonteerScript } from "../src/scripts/registerVolonteerScript";
 
 // Import additionals components
 import { Render } from "./components/Render";
@@ -24,7 +25,7 @@ import { Cache } from "./components/Cache";
 import { Cryptography } from "./components/Cryptography";
 import { Volonteers } from "./components/Volonteers";
 import { Organizations } from "./components/Organizations";
-import { Claims } from './components/Claims'
+import { Claims } from "./components/Claims";
 
 import { calcMd5 } from "./functions/calcMd5";
 
@@ -48,12 +49,21 @@ const cryptography = new Cryptography(DATA_ENCRYPTION_KEY, cache);
 const volonteers = new Volonteers(prisma);
 const organizations = new Organizations(prisma);
 
+const SCRIPTS = [
+  helpCommand,
+  createOrganizationScript,
+  viewOrganizationsCommand,
+  registerVolonteerScript,
+];
+
+const CALLBACKS = [testQueryCallback];
+
 // Create blaze-bot
 const core = new BotCore(
   {
-    scripts: [helpCommand, createOrganizationScript, viewOrganizationsCommand],
+    scripts: SCRIPTS,
+    callbacks: CALLBACKS,
     preDefinedAdmins: PRE_DEFINED_ADMINS.split(",").map((id) => Number(id)),
-    callbacks: [testQueryCallback],
   },
   [
     {
@@ -81,9 +91,9 @@ const core = new BotCore(
       component: calcMd5,
     },
     {
-      name: 'claims',
-      component: Claims
-    }
+      name: "claims",
+      component: Claims,
+    },
   ],
 );
 
