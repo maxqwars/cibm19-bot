@@ -103,4 +103,13 @@ export class Volonteers {
       },
     });
   }
+
+  async memberOf(id: number) {
+    return await this._client.volonteer.findFirst({
+      where: {
+        id,
+        organizationId: { not: null },
+      },
+    });
+  }
 }
