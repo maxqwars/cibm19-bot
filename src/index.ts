@@ -147,7 +147,43 @@ core
   .bindOnMessageEvent(
     bot,
     async (ctx, core) => {
+      const reports = core.getModule("reports") as Reports;
       const render = core.getModule("render") as Render;
+      const volonteers = core.getModule("volonteers") as Volonteers;
+
+      const volonteer = await volonteers.findVolonteerUnderTelegramId(
+        ctx.from.id,
+      );
+
+      logger.info(
+        `[NO SCRIPT] Is social link: ${isSocialUrl(ctx.text.trim())}`,
+      );
+
+      if (isSocialUrl(ctx.text.trim())) {
+        const candidate = await reports.findReportFromVolonteerContainsPayload(
+          volonteer.id,
+          ctx.text.trim(),
+        );
+
+        if (candidate) {
+          const replyContent = await render.render(
+            "report-already-created.txt",
+            {},
+          );
+          ctx.reply(replyContent);
+          return;
+        }
+
+        await reports.create({
+          payload: ctx.text.trim(),
+          volonteerId: volonteer.id,
+        });
+
+        const replyMessage = await render.render("report-created.txt", {});
+        ctx.reply(replyMessage);
+        return;
+      }
+
       const contentMessage = await render.render("no-script-err.txt", {});
       ctx.reply(contentMessage);
     },
