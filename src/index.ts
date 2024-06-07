@@ -28,6 +28,10 @@ import { Cryptography } from "./components/Cryptography";
 import { Volonteers } from "./components/Volonteers";
 import { Organizations } from "./components/Organizations";
 import { Claims } from "./components/Claims";
+import { Reports } from './components/Reports'
+
+// Import functions
+import { isSocialUrl } from './functions/isSocialUrl'
 
 config();
 
@@ -49,6 +53,7 @@ const cryptography = new Cryptography(DATA_ENCRYPTION_KEY, cache);
 const volonteers = new Volonteers(prisma);
 const organizations = new Organizations(prisma);
 const claims = new Claims(prisma);
+const reports = new Reports(prisma)
 
 const SCRIPTS = [
   helpCommand,
@@ -86,6 +91,10 @@ const COMPONENTS = [
     name: "claims",
     component: claims,
   },
+  {
+    name: "reports",
+    component: Reports
+  }
 ];
 
 // Create blaze-bot
