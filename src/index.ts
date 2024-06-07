@@ -29,8 +29,6 @@ import { Volonteers } from "./components/Volonteers";
 import { Organizations } from "./components/Organizations";
 import { Claims } from "./components/Claims";
 
-import { calcMd5 } from "./functions/calcMd5";
-
 config();
 
 /* Get environment variables */
@@ -63,6 +61,33 @@ const SCRIPTS = [
 
 const CALLBACKS = [testQueryCallback];
 
+const COMPONENTS = [
+  {
+    name: "cryptography",
+    component: cryptography,
+  },
+  {
+    name: "cache",
+    component: cache,
+  },
+  {
+    name: "render",
+    component: render,
+  },
+  {
+    name: "volonteers",
+    component: volonteers,
+  },
+  {
+    name: "organizations",
+    component: organizations,
+  },
+  {
+    name: "claims",
+    component: claims,
+  },
+];
+
 // Create blaze-bot
 const core = new BotCore(
   {
@@ -70,36 +95,7 @@ const core = new BotCore(
     callbacks: CALLBACKS,
     preDefinedAdmins: PRE_DEFINED_ADMINS.split(",").map((id) => Number(id)),
   },
-  [
-    {
-      name: "cryptography",
-      component: cryptography,
-    },
-    {
-      name: "cache",
-      component: cache,
-    },
-    {
-      name: "render",
-      component: render,
-    },
-    {
-      name: "volonteers",
-      component: volonteers,
-    },
-    {
-      name: "organizations",
-      component: organizations,
-    },
-    {
-      name: "calculateMd5",
-      component: calcMd5,
-    },
-    {
-      name: "claims",
-      component: claims,
-    },
-  ],
+  COMPONENTS,
 );
 
 // Create telegram bot
