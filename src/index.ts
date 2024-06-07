@@ -19,6 +19,7 @@ import createOrganizationScript from "./scripts/createOrganization";
 import { viewOrganizationsCommand } from "./scripts/viewOrganizationsCommand";
 import { registerVolonteerScript } from "./scripts/registerVolonteerScript";
 import { claimsCommand } from "./scripts/claimsCommand";
+import { privacyCommand } from "./scripts/privacyCommand";
 
 // Import additionals components
 import { Render } from "./components/Render";
@@ -57,6 +58,7 @@ const SCRIPTS = [
   viewOrganizationsCommand,
   registerVolonteerScript,
   claimsCommand,
+  privacyCommand,
 ];
 
 const CALLBACKS = [testQueryCallback];
