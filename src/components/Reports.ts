@@ -23,6 +23,16 @@ export class Reports {
     });
   }
 
+  async retrieveOutstandingReports() {
+    return await this._client.report.findMany({
+      where: {
+        confirmed: null,
+      },
+      skip: 0,
+      take: 10,
+    });
+  }
+
   async getById(id: number) {
     return await this._client.report.findFirst({
       where: {
