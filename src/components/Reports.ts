@@ -28,7 +28,6 @@ export class Reports {
       where: {
         confirmed: null,
       },
-      skip: 0,
       take: 10,
     });
   }
@@ -91,8 +90,8 @@ export class Reports {
   async hashReportsCount(hash: string) {
     return await this._client.report.count({
       where: {
-        hash
-      }
-    })
+        hash,
+      },
+    });
   }
 }

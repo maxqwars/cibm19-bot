@@ -20,6 +20,7 @@ import { viewOrganizationsCommand } from "./scripts/viewOrganizationsCommand";
 import { registerVolonteerScript } from "./scripts/registerVolonteerScript";
 import { claimsCommand } from "./scripts/claimsCommand";
 import { privacyCommand } from "./scripts/privacyCommand";
+import { reportsCommand } from "./scripts/reportsCommand";
 
 // Import additionals components
 import { Render } from "./components/Render";
@@ -62,6 +63,7 @@ const SCRIPTS = [
   registerVolonteerScript,
   claimsCommand,
   privacyCommand,
+  reportsCommand,
 ];
 
 const CALLBACKS = [testQueryCallback];
