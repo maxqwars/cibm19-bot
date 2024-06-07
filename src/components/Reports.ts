@@ -65,4 +65,16 @@ export class Reports {
       },
     });
   }
+
+  async findReportFromVolonteerContainsPayload(
+    volonteerId: number,
+    payload: string,
+  ) {
+    return await this._client.report.findFirst({
+      where: {
+        volonteerId,
+        payload,
+      },
+    });
+  }
 }
