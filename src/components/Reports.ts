@@ -87,4 +87,12 @@ export class Reports {
       },
     });
   }
+
+  async hashReportsCount(hash: string) {
+    return await this._client.report.count({
+      where: {
+        hash
+      }
+    })
+  }
 }
