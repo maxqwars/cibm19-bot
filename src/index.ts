@@ -14,7 +14,7 @@ import { Telegraf } from "telegraf";
 import testQueryCallback from "./lambdas/testQueryCallback";
 
 // Import scripts
-import helpCommand from "./scripts/helpCommand";
+import { helpCommand } from "./scripts/helpCommand";
 import createOrganizationScript from "./scripts/createOrganization";
 import { viewOrganizationsCommand } from "./scripts/viewOrganizationsCommand";
 import { registerVolunteerScript as registerVolunteerScript } from "./scripts/registerVolunteerScript";

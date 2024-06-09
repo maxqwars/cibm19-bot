@@ -1,7 +1,7 @@
 import { Render } from "../components/Render";
 import { Scriptor } from "../helpers/Scriptor";
 
-export default new Scriptor({
+export const helpCommand = new Scriptor({
   name: "help-cmd",
   entryPoint: {
     command: "help",
