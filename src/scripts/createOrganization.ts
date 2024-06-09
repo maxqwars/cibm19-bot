@@ -2,7 +2,7 @@ import { Organizations } from "../components/Organizations";
 import { Render } from "../components/Render";
 import { Scriptor } from "../helpers/Scriptor";
 import { calcMd5 } from "../functions/calcMd5";
-import { Volonteers } from "../components/Volonteers";
+import { Volunteers } from "../components/Volunteers";
 import { $Enums } from "@prisma/client";
 
 const createOrganizationScript = new Scriptor({
@@ -11,13 +11,13 @@ const createOrganizationScript = new Scriptor({
     command: "create_org",
     cb: async (context, core) => {
       const render = core.getModule("render") as Render;
-      const volonteers = core.getModule("volonteers") as Volonteers;
+      const volunteers = core.getModule("volunteers") as Volunteers;
 
-      const volonteer = await volonteers.findVolonteerUnderTelegramId(
+      const volunteer = await volunteers.findVolunteerUnderTelegramId(
         context.from.id,
       );
 
-      if (volonteer.role !== $Enums.ROLE.ADMIN) {
+      if (volunteer.role !== $Enums.ROLE.ADMIN) {
         const replyMessage = await render.render(
           "no-access-to-operation.txt",
           {},
@@ -40,13 +40,13 @@ createOrganizationScript.addStage(async (context, core) => {
   const text = context.text;
   const organizations = core.getModule("organizations") as Organizations;
   const render = core.getModule("render") as Render;
-  const volonteers = core.getModule("volonteers") as Volonteers;
+  const volunteers = core.getModule("volunteers") as Volunteers;
 
-  const volonteer = await volonteers.findVolonteerUnderTelegramId(
+  const volunteer = await volunteers.findVolunteerUnderTelegramId(
     context.from.id,
   );
 
-  if (volonteer.role !== $Enums.ROLE.ADMIN) {
+  if (volunteer.role !== $Enums.ROLE.ADMIN) {
     const replyMessage = await render.render("no-access-to-operation.txt", {});
     context.reply(replyMessage);
     return;

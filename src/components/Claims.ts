@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import logger from "../logger";
 
 type ClaimCreateDataDto = {
-  volonteerId: number;
+  volunteerId: number;
   organizationId: number;
 };
 
@@ -19,10 +19,10 @@ export class Claims {
     });
   }
 
-  async volonteerClaims(volonteerId: number) {
+  async volunteerClaims(volunteerId: number) {
     return await this._client.claim.findMany({
       where: {
-        volonteerId,
+        volunteerId: volunteerId,
       },
     });
   }

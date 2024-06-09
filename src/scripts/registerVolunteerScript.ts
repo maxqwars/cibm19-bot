@@ -1,26 +1,26 @@
 import { $Enums } from "@prisma/client";
 import { Claims } from "../components/Claims";
 import { Render } from "../components/Render";
-import { Volonteers } from "../components/Volonteers";
+import { Volunteers } from "../components/Volunteers";
 import { Scriptor } from "../helpers/Scriptor";
 import dayjs from "dayjs";
 import logger from "../logger";
 import { Organizations } from "../components/Organizations";
 
-const registerVolonteer = new Scriptor({
-  name: "register-volonteer-script",
+const registerVolunteer = new Scriptor({
+  name: "register-volunteer-script",
   entryPoint: {
     command: "register",
     cb: async (context, core) => {
-      const volonteers = core.getModule("volonteers") as Volonteers;
+      const volunteers = core.getModule("volunteers") as Volunteers;
       const render = core.getModule("render") as Render;
       const claims = core.getModule("claims") as Claims;
 
-      const volonteer = await volonteers.findVolonteerUnderTelegramId(
+      const volunteer = await volunteers.findVolunteerUnderTelegramId(
         context.from.id,
       );
 
-      if (volonteer.role === $Enums.ROLE.VOLONTEER) {
+      if (volunteer.role === $Enums.ROLE.VOLUNTEER) {
         const replyMessage = await render.render(
           "you_already_registered.txt",
           {},
@@ -29,9 +29,9 @@ const registerVolonteer = new Scriptor({
         return true;
       }
 
-      const volonteerClaims = await claims.volonteerClaims(volonteer.id);
+      const volunteerClaims = await claims.volunteerClaims(volunteer.id);
 
-      if (volonteerClaims) {
+      if (volunteerClaims) {
         const replyMessage = await render.render(
           "claim-already-created.txt",
           {},
@@ -51,17 +51,17 @@ const registerVolonteer = new Scriptor({
 });
 
 // Enter birthday date
-registerVolonteer.addStage(async (context, core) => {
-  const volonteers = core.getModule("volonteers") as Volonteers;
+registerVolunteer.addStage(async (context, core) => {
+  const volunteers = core.getModule("volunteers") as Volunteers;
   const render = core.getModule("render") as Render;
 
-  const volonteer = await volonteers.findVolonteerUnderTelegramId(
+  const volunteer = await volunteers.findVolunteerUnderTelegramId(
     context.from.id,
   );
   const fio = context.text;
 
-  const updatedVolonteer = volonteers.updateVolonteerFio(volonteer.id, fio);
-  if (!updatedVolonteer) {
+  const updatedVolunteer = volunteers.updateVolunteerFio(volunteer.id, fio);
+  if (!updatedVolunteer) {
     const replyMessage = await render.render("error-while-script-proc.txt", {});
     context.reply(replyMessage);
     return false;
@@ -72,14 +72,14 @@ registerVolonteer.addStage(async (context, core) => {
   return true;
 });
 
-registerVolonteer.addStage(async (context, core) => {
-  const volonteers = core.getModule("volonteers") as Volonteers;
+registerVolunteer.addStage(async (context, core) => {
+  const volunteers = core.getModule("volunteers") as Volunteers;
   const render = core.getModule("render") as Render;
   const organizations = core.getModule("organizations") as Organizations;
 
-  function getAge(birthdate: string) {
+  function getAge(birthday: string) {
     const today = new Date();
-    const birth = new Date(birthdate);
+    const birth = new Date(birthday);
 
     const age = today.getFullYear() - birth.getFullYear();
     const m = today.getMonth() - birth.getMonth();
@@ -90,15 +90,15 @@ registerVolonteer.addStage(async (context, core) => {
   }
 
   const birthday = context.text;
-  const volonteer = await volonteers.findVolonteerUnderTelegramId(
+  const volunteer = await volunteers.findVolunteerUnderTelegramId(
     context.from.id,
   );
   const isAdult = getAge(birthday) >= 18;
 
   logger.info(`isAdult: ${isAdult}`);
 
-  const updatedVolonteer = await volonteers.updateVolonteerAdultStatus(
-    volonteer.id,
+  const updatedVolunteer = await volunteers.updateVolunteerAdultStatus(
+    volunteer.id,
     false,
   );
   const openOrganizations = await organizations.getUnlocked();
@@ -115,19 +115,19 @@ registerVolonteer.addStage(async (context, core) => {
   return true;
 });
 
-registerVolonteer.addStage(async (context, core) => {
+registerVolunteer.addStage(async (context, core) => {
   const organizations = core.getModule("organizations") as Organizations;
   const claims = core.getModule("claims") as Claims;
-  const volonteers = core.getModule("volonteers") as Volonteers;
+  const volunteers = core.getModule("volunteers") as Volunteers;
   const render = core.getModule("render") as Render;
 
   const organizationId = Number(context.from.id);
-  const volonteer = await volonteers.findVolonteerUnderTelegramId(
+  const volunteer = await volunteers.findVolunteerUnderTelegramId(
     context.from.id,
   );
 
   const createdClaim = await claims.create({
-    volonteerId: volonteer.id,
+    volunteerId: volunteer.id,
     organizationId,
   });
 
@@ -144,4 +144,4 @@ registerVolonteer.addStage(async (context, core) => {
   return true;
 });
 
-export const registerVolonteerScript = registerVolonteer;
+export const registerVolunteerScript = registerVolunteer;

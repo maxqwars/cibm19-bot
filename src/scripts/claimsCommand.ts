@@ -1,6 +1,6 @@
 import { $Enums } from "@prisma/client";
 import { Claims } from "../components/Claims";
-import { Volonteers } from "../components/Volonteers";
+import { Volunteers } from "../components/Volunteers";
 import { Scriptor } from "../helpers/Scriptor";
 import { Render } from "../components/Render";
 import { Markup } from "telegraf";
@@ -12,17 +12,17 @@ const claimsCommandConstruct = new Scriptor({
   entryPoint: {
     command: "claims",
     cb: async (context, core) => {
-      const volonteers = core.getModule("volonteers") as Volonteers;
+      const volunteers = core.getModule("volunteers") as Volunteers;
       const claims = core.getModule("claims") as Claims;
       const render = core.getModule("render") as Render;
       const organizations = core.getModule("organizations") as Organizations;
 
-      const volonteer = await volonteers.findVolonteerUnderTelegramId(
+      const volunteer = await volunteers.findVolunteerUnderTelegramId(
         context.from.id,
       );
 
-      // Adminstrator see all claims
-      if (volonteer.role === $Enums.ROLE.ADMIN) {
+      // Administrator see all claims
+      if (volunteer.role === $Enums.ROLE.ADMIN) {
         const allOrgs = await organizations.getAll();
         let formattedOrgs = "";
 
@@ -38,7 +38,7 @@ const claimsCommandConstruct = new Scriptor({
         return true;
       }
 
-      if (volonteer.role !== $Enums.ROLE.CURATOR) {
+      if (volunteer.role !== $Enums.ROLE.CURATOR) {
         const replyMessage = await render.render(
           "no-access-to-operation.txt",
           {},
@@ -47,7 +47,7 @@ const claimsCommandConstruct = new Scriptor({
         return true;
       }
 
-      const { organizationId } = await volonteers.memberOf(volonteer.id);
+      const { organizationId } = await volunteers.memberOf(volunteer.id);
       const claimsArr = await claims.organizationClaims(organizationId);
 
       if (!claimsArr.length) {
@@ -57,13 +57,13 @@ const claimsCommandConstruct = new Scriptor({
       }
 
       for (const claim of claimsArr) {
-        const claimInitiatorData = await volonteers.findVolonteerUnderId(
-          claim.volonteerId,
+        const claimInitiatorData = await volunteers.findVolunteerUnderId(
+          claim.volunteerId,
         );
 
         const messagePayload = await render.render("claim-preview.txt", {
           telegramUsername: claimInitiatorData.telegramUsername,
-          volonteerFio: claimInitiatorData.fio,
+          volunteerFio: claimInitiatorData.fio,
           telegramName: claimInitiatorData.telegramName,
         });
 
@@ -85,7 +85,7 @@ const claimsCommandConstruct = new Scriptor({
 claimsCommandConstruct.addStage(async (context, core) => {
   const claims = core.getModule("claims") as Claims;
   const render = core.getModule("render") as Render;
-  const volonteers = core.getModule("volonteers") as Volonteers;
+  const volunteers = core.getModule("volunteers") as Volunteers;
 
   for (const method in claims) {
     logger.info(method);
@@ -101,13 +101,13 @@ claimsCommandConstruct.addStage(async (context, core) => {
   }
 
   for (const claim of claimsArr) {
-    const claimInitiatorData = await volonteers.findVolonteerUnderId(
-      claim.volonteerId,
+    const claimInitiatorData = await volunteers.findVolunteerUnderId(
+      claim.volunteerId,
     );
 
     const messagePayload = await render.render("claim-preview.txt", {
       telegramUsername: claimInitiatorData.telegramUsername,
-      volonteerFio: claimInitiatorData.fio,
+      volunteerFio: claimInitiatorData.fio,
       telegramName: claimInitiatorData.telegramName,
     });
 

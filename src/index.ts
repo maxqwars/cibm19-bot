@@ -17,17 +17,17 @@ import testQueryCallback from "./lambdas/testQueryCallback";
 import helpCommand from "./scripts/helpCommand";
 import createOrganizationScript from "./scripts/createOrganization";
 import { viewOrganizationsCommand } from "./scripts/viewOrganizationsCommand";
-import { registerVolonteerScript } from "./scripts/registerVolonteerScript";
+import { registerVolunteerScript as registerVolunteerScript } from "./scripts/registerVolunteerScript";
 import { claimsCommand } from "./scripts/claimsCommand";
 import { privacyCommand } from "./scripts/privacyCommand";
 import { reportsCommand } from "./scripts/reportsCommand";
 import { startCommand } from "./scripts/startCommand";
 
-// Import additionals components
+// Import additional components
 import { Render } from "./components/Render";
 import { Cache } from "./components/Cache";
 import { Cryptography } from "./components/Cryptography";
-import { Volonteers } from "./components/Volonteers";
+import { Volunteers } from "./components/Volunteers";
 import { Organizations } from "./components/Organizations";
 import { Claims } from "./components/Claims";
 import { Reports } from "./components/Reports";
@@ -52,7 +52,7 @@ const memClient = memjs.Client.create(MEMCACHED_HOSTS, {});
 const cache = new Cache(memClient);
 const render = new Render(join(cwd(), "./src/views"), cache);
 const cryptography = new Cryptography(DATA_ENCRYPTION_KEY, cache);
-const volonteers = new Volonteers(prisma);
+const volunteers = new Volunteers(prisma);
 const organizations = new Organizations(prisma);
 const claims = new Claims(prisma);
 const reports = new Reports(prisma);
@@ -61,7 +61,7 @@ const SCRIPTS = [
   helpCommand,
   createOrganizationScript,
   viewOrganizationsCommand,
-  registerVolonteerScript,
+  registerVolunteerScript,
   claimsCommand,
   privacyCommand,
   reportsCommand,
@@ -84,8 +84,8 @@ const COMPONENTS = [
     component: render,
   },
   {
-    name: "volonteers",
-    component: volonteers,
+    name: "volunteers",
+    component: volunteers,
   },
   {
     name: "organizations",
@@ -123,8 +123,8 @@ core
     );
   })
   .addMiddleware(bot, async (ctx, core) => {
-    const volonteers = core.getModule("volonteers") as Volonteers;
-    const candidate = await volonteers.findVolonteerUnderTelegramId(
+    const volunteers = core.getModule("volunteers") as Volunteers;
+    const candidate = await volunteers.findVolunteerUnderTelegramId(
       ctx.from.id,
     );
 
@@ -133,7 +133,7 @@ core
         Number(str),
       );
 
-      await volonteers.createWithData({
+      await volunteers.createWithData({
         fio: "",
         telegramId: ctx.from.id,
         telegramUsername: `${ctx.from.username}`,
@@ -153,9 +153,9 @@ core
     async (ctx, core) => {
       const reports = core.getModule("reports") as Reports;
       const render = core.getModule("render") as Render;
-      const volonteers = core.getModule("volonteers") as Volonteers;
+      const volunteers = core.getModule("volunteers") as Volunteers;
 
-      const volonteer = await volonteers.findVolonteerUnderTelegramId(
+      const volunteer = await volunteers.findVolunteerUnderTelegramId(
         ctx.from.id,
       );
 
@@ -164,8 +164,8 @@ core
       );
 
       if (isSocialUrl(ctx.text.trim())) {
-        const candidate = await reports.findReportFromVolonteerContainsPayload(
-          volonteer.id,
+        const candidate = await reports.findReportFromVolunteerContainsPayload(
+          volunteer.id,
           ctx.text.trim(),
         );
 
@@ -180,7 +180,7 @@ core
 
         await reports.create({
           payload: ctx.text.trim(),
-          volonteerId: volonteer.id,
+          volunteerId: volunteer.id,
         });
 
         const replyMessage = await render.render("report-created.txt", {});

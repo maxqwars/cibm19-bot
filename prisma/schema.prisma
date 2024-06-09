@@ -10,10 +10,10 @@ datasource db {
 enum ROLE {
   ADMIN
   CURATOR
-  VOLONTEER
+  VOLUNTEER
 }
 
-model Volonteer {
+model Volunteer {
   id   Int    @id @default(autoincrement())
   fio  String
   role ROLE?
@@ -39,8 +39,8 @@ model Report {
   confirmed   Boolean?
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
-  volonteer   Volonteer @relation(fields: [volonteerId], references: [id])
-  volonteerId Int
+  volunteer   Volunteer @relation(fields: [volunteerId], references: [id])
+  volunteerId Int
 }
 
 model Organization {
@@ -48,14 +48,14 @@ model Organization {
   name    String      @unique
   domain  String      @unique
   closed  Boolean     @default(false)
-  members Volonteer[]
+  members Volunteer[]
   claims  Claim[]
 }
 
 model Claim {
   id             Int          @id @default(autoincrement())
-  volonteer      Volonteer    @relation(fields: [volonteerId], references: [id])
+  volunteer      Volunteer    @relation(fields: [volunteerId], references: [id])
   organization   Organization @relation(fields: [organizationId], references: [id])
-  volonteerId    Int
+  volunteerId    Int
   organizationId Int
 }

@@ -1,6 +1,6 @@
 import { $Enums } from "@prisma/client";
 import { Render } from "../components/Render";
-import { Volonteers } from "../components/Volonteers";
+import { Volunteers } from "../components/Volunteers";
 import { Scriptor } from "../helpers/Scriptor";
 import { Organizations } from "../components/Organizations";
 
@@ -10,10 +10,10 @@ export const viewOrganizationsCommand = new Scriptor({
     command: "view_orgs",
     cb: async (context, core) => {
       const render = core.getModule("render") as Render;
-      const volonteers = core.getModule("volonteers") as Volonteers;
+      const volunteers = core.getModule("volunteers") as Volunteers;
       const organizations = core.getModule("organizations") as Organizations;
 
-      const { role } = await volonteers.findVolonteerUnderTelegramId(
+      const { role } = await volunteers.findVolunteerUnderTelegramId(
         context.from.id,
       );
 

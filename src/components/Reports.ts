@@ -3,7 +3,7 @@ import { calcMd5 } from "../functions/calcMd5";
 
 type CreateReportDto = {
   payload: string;
-  volonteerId: number;
+  volunteerId: number;
 };
 
 export class Reports {
@@ -18,7 +18,7 @@ export class Reports {
       data: {
         payload: data.payload,
         hash: calcMd5(data.payload),
-        volonteerId: data.volonteerId,
+        volunteerId: data.volunteerId,
       },
     });
   }
@@ -56,10 +56,10 @@ export class Reports {
     });
   }
 
-  async getManyByVolonteer(volonteerId: number) {
+  async getManyByVolunteer(volunteerId: number) {
     return await this._client.report.findMany({
       where: {
-        volonteerId,
+        volunteerId: volunteerId,
       },
     });
   }
@@ -75,13 +75,13 @@ export class Reports {
     });
   }
 
-  async findReportFromVolonteerContainsPayload(
-    volonteerId: number,
+  async findReportFromVolunteerContainsPayload(
+    volunteerId: number,
     payload: string,
   ) {
     return await this._client.report.findFirst({
       where: {
-        volonteerId,
+        volunteerId: volunteerId,
         payload,
       },
     });

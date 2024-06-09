@@ -1,7 +1,7 @@
 import { $Enums, PrismaClient } from "@prisma/client";
 import logger from "../logger";
 
-type VolonteerCreateDataDto = {
+type VolunteerCreateDataDto = {
   fio: string;
   telegramId: number;
   telegramUsername: string;
@@ -9,59 +9,59 @@ type VolonteerCreateDataDto = {
   role?: $Enums.ROLE;
 };
 
-export class Volonteers {
+export class Volunteers {
   private readonly _client: PrismaClient;
 
   constructor(prisma: PrismaClient) {
     this._client = prisma;
   }
 
-  async createWithData(dto: VolonteerCreateDataDto) {
+  async createWithData(dto: VolunteerCreateDataDto) {
     try {
-      return await this._client.volonteer.create({
+      return await this._client.volunteer.create({
         data: {
           ...dto,
           balance: 0,
         },
       });
     } catch (err) {
-      logger.error(`Failed create new volonteer record, reason:`);
+      logger.error(`Failed create new volunteer record, reason:`);
       logger.error(err.message);
       return;
     }
   }
 
-  async findVolonteerUnderTelegramId(telegramId: number) {
+  async findVolunteerUnderTelegramId(telegramId: number) {
     try {
-      return await this._client.volonteer.findUnique({
+      return await this._client.volunteer.findUnique({
         where: {
           telegramId,
         },
       });
     } catch (err) {
-      logger.error(`Failed find volonteer record, reason:`);
+      logger.error(`Failed find volunteer record, reason:`);
       logger.error(err.message);
       return;
     }
   }
 
-  async findVolonteerUnderId(id: number) {
+  async findVolunteerUnderId(id: number) {
     try {
-      return await this._client.volonteer.findFirst({
+      return await this._client.volunteer.findFirst({
         where: {
           id,
         },
       });
     } catch (err) {
-      logger.error(`Failed find volonteer (under ID) record, reason:`);
+      logger.error(`Failed find volunteer (under ID) record, reason:`);
       logger.error(err.message);
       return;
     }
   }
 
-  async updateVolonteerFio(id: number, fio: string) {
+  async updateVolunteerFio(id: number, fio: string) {
     try {
-      return await this._client.volonteer.update({
+      return await this._client.volunteer.update({
         where: {
           id,
         },
@@ -70,15 +70,15 @@ export class Volonteers {
         },
       });
     } catch (err) {
-      logger.error(`Failed update volonteer [${id}] fio  field, reason:`);
+      logger.error(`Failed update volunteer [${id}] fio  field, reason:`);
       logger.error(err.message);
       return;
     }
   }
 
-  async updateVolonteerRole(id: number, role: $Enums.ROLE) {
+  async updateVolunteerRole(id: number, role: $Enums.ROLE) {
     try {
-      return await this._client.volonteer.update({
+      return await this._client.volunteer.update({
         where: {
           id,
         },
@@ -87,14 +87,14 @@ export class Volonteers {
         },
       });
     } catch (err) {
-      logger.error(`Failed update volonteer [${id}] role field, reason:`);
+      logger.error(`Failed update volunteer [${id}] role field, reason:`);
       logger.error(err.message);
       return;
     }
   }
 
-  async updateVolonteerAdultStatus(id: number, isAdult: boolean) {
-    return await this._client.volonteer.update({
+  async updateVolunteerAdultStatus(id: number, isAdult: boolean) {
+    return await this._client.volunteer.update({
       where: {
         id,
       },
@@ -105,7 +105,7 @@ export class Volonteers {
   }
 
   async memberOf(id: number) {
-    return await this._client.volonteer.findFirst({
+    return await this._client.volunteer.findFirst({
       where: {
         id,
         organizationId: { not: null },

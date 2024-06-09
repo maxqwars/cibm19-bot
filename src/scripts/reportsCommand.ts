@@ -1,7 +1,7 @@
 import { Render } from "../components/Render";
 import { Reports } from "../components/Reports";
 import { Scriptor } from "../helpers/Scriptor";
-import { Volonteers } from "../components/Volonteers";
+import { Volunteers } from "../components/Volunteers";
 import { $Enums } from "@prisma/client";
 import dayjs from "dayjs";
 import { Markup } from "telegraf";
@@ -19,11 +19,11 @@ export const reportsCommand = new Scriptor({
 
       const render = (await core.getModule("render")) as Render;
       const reports = (await core.getModule("reports")) as Reports;
-      const volonteers = (await core.getModule("volonteers")) as Volonteers;
+      const volunteers = (await core.getModule("volunteers")) as Volunteers;
 
-      const volonteer = await volonteers.findVolonteerUnderTelegramId(id);
+      const volunteer = await volunteers.findVolunteerUnderTelegramId(id);
 
-      if (volonteer.role !== $Enums.ROLE.ADMIN) {
+      if (volunteer.role !== $Enums.ROLE.ADMIN) {
         const replyMessage = await render.render(
           "no-access-to-operation.txt",
           {},
