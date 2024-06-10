@@ -1,5 +1,5 @@
 // Build-in node modules
-import { env, cwd } from "node:process";
+import { env, cwd, report } from "node:process";
 import { join } from "node:path";
 
 // Third party modules
@@ -10,8 +10,8 @@ import { BotCore } from "./modules/BotCore";
 import logger from "./logger";
 import { Telegraf } from "telegraf";
 
-// import callback (for callbackQuery)
-import testQueryCallback from "./lambdas/testQueryCallback";
+import { claimCallback } from "./lambdas/claimCallback";
+import { reportCallback } from "./lambdas/reportCallback";
 
 // Import scripts
 import { helpCommand } from "./scripts/helpCommand";
@@ -68,7 +68,7 @@ const SCRIPTS = [
   startCommand,
 ];
 
-const CALLBACKS = [testQueryCallback];
+const CALLBACKS = [claimCallback, reportCallback];
 
 const COMPONENTS = [
   {
