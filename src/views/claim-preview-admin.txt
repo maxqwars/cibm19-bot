@@ -1,0 +1,4 @@
+Автор: @{{telegramUsername}}
+ФИО: {{volonteerFio}}
+Имя телеграм: {{telegramName}}
+В организацию: {{organizationName}}

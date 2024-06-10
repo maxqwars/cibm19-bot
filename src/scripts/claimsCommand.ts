@@ -86,6 +86,7 @@ claimsCommandConstruct.addStage(async (context, core) => {
   const claims = core.getModule("claims") as Claims;
   const render = core.getModule("render") as Render;
   const volunteers = core.getModule("volunteers") as Volunteers;
+  const organizations = core.getModule("organizations") as Organizations;
 
   for (const method in claims) {
     logger.info(method);
@@ -105,10 +106,13 @@ claimsCommandConstruct.addStage(async (context, core) => {
       claim.volunteerId,
     );
 
-    const messagePayload = await render.render("claim-preview.txt", {
+    const organizationData = await organizations.findById(claim.organizationId);
+
+    const messagePayload = await render.render("claim-preview-admin.txt", {
       telegramUsername: claimInitiatorData.telegramUsername,
       volunteerFio: claimInitiatorData.fio,
       telegramName: claimInitiatorData.telegramName,
+      organizationName: organizationData.name,
     });
 
     context.telegram.sendMessage(
