@@ -43,4 +43,12 @@ export class Claims {
       skip: 0,
     });
   }
+
+  async delete(id: number) {
+    return await this._client.claim.delete({
+      where: {
+        id,
+      },
+    });
+  }
 }

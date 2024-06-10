@@ -112,4 +112,15 @@ export class Volunteers {
       },
     });
   }
+
+  async addOrganization(id: number, organizationId: number) {
+    return await this._client.volunteer.update({
+      where: {
+        id,
+      },
+      data: {
+        organizationId,
+      },
+    });
+  }
 }
