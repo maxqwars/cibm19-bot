@@ -22,6 +22,10 @@ import { claimsCommand } from "./scripts/claimsCommand";
 import { privacyCommand } from "./scripts/privacyCommand";
 import { reportsCommand } from "./scripts/reportsCommand";
 import { startCommand } from "./scripts/startCommand";
+import { leaderboardCommand } from "./scripts/leaderboardCommand";
+import { lockdownCommand } from "./scripts/lockdownCommand";
+import { myOrganizationCommand } from "./scripts/myOrganizationCommand";
+import { profileCommand } from "./scripts/profileCommand";
 
 // Import additional components
 import { Render } from "./components/Render";
@@ -66,6 +70,10 @@ const SCRIPTS = [
   privacyCommand,
   reportsCommand,
   startCommand,
+  leaderboardCommand,
+  lockdownCommand,
+  myOrganizationCommand,
+  profileCommand,
 ];
 
 const CALLBACKS = [claimCallback, reportCallback];
