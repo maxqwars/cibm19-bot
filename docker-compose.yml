@@ -22,12 +22,10 @@ services:
     build: .
     command: "npm run deploy-and-start"
     environment:
-      DATABASE_URL: "${DATABASE_URL}"
-      TG_BOT_TOKEN: "${TG_BOT_TOKEN}"
-      ADMINISTRATORS_TG_IDS: "${ADMINISTRATORS_TG_IDS}"
+      DATABASE_URL: "postgresql://postgres:${POSTGRES_PASSWORD}@172.16.238.3:5432/cibm19_bot"
+      TELEGRAM_BOT_TOKEN: "${TELEGRAM_BOT_TOKEN}"
+      PRE_DEFINED_ADMINS: "${PRE_DEFINED_ADMINS}"
       DATA_ENCRIPTION_KEY: "${DATA_ENCRIPTION_KEY}"
-      TG_WEBHOOK_DOMAIN: "${TG_WEBHOOK_DOMAIN}"
-      TG_WEBHOOK_PORT: "${TG_WEBHOOK_PORT}"
       MODE: "${MODE}"
       MEMCACHED_HOSTS: "${MEMCACHED_HOSTS}"
     depends_on:
