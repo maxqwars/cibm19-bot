@@ -26,6 +26,7 @@ import { leaderboardCommand } from "./scripts/leaderboardCommand";
 import { lockdownCommand } from "./scripts/lockdownCommand";
 import { myOrganizationCommand } from "./scripts/myOrganizationCommand";
 import { profileCommand } from "./scripts/profileCommand";
+import { feedbackCommand } from './scripts/feedbackCommand'
 
 // Import additional components
 import { Render } from "./components/Render";
@@ -74,6 +75,7 @@ const SCRIPTS = [
   lockdownCommand,
   myOrganizationCommand,
   profileCommand,
+  feedbackCommand
 ];
 
 const CALLBACKS = [claimCallback, reportCallback];
