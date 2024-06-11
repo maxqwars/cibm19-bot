@@ -120,4 +120,26 @@ export class Reports {
       },
     });
   }
+
+  async rejectReportsWithHash(hash: string) {
+    return await this._client.report.updateMany({
+      where: {
+        hash,
+      },
+      data: {
+        confirmed: false,
+      },
+    });
+  }
+
+  async confirmReportsWithHash(hash: string) {
+    return await this._client.report.updateMany({
+      where: {
+        hash,
+      },
+      data: {
+        confirmed: true,
+      },
+    });
+  }
 }
