@@ -56,6 +56,17 @@ export const profileCommand = new Scriptor({
       const percent = (confirmedReportsCount / allReportsCount) * 100;
       let rank = "none";
 
+      for (const range in RANK_MAPPING) {
+        const [endNum, startNum] = range.split("-");
+
+        if (
+          Math.round(percent) >= Number(startNum) &&
+          Math.round(percent) <= Number(endNum)
+        ) {
+          rank = RANK_MAPPING[`${endNum}-${startNum}`];
+        }
+      }
+
       const replyMessage = await render.render("volunteer-profile.txt", {
         fio: volunteer.fio,
         username: volunteer.telegramUsername,
@@ -68,7 +79,7 @@ export const profileCommand = new Scriptor({
         reportsCount: allReportsCount,
         confirmedReportsCount: confirmedReportsCount,
         notConfirmedReportCount: notConfirmedReportsCount,
-        percent: allReportsCount === 0 ? 0 : percent,
+        percent: allReportsCount === 0 ? `0%` : `${Math.round(percent)}%`,
       });
 
       context.reply(replyMessage);
