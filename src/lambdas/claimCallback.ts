@@ -6,6 +6,7 @@ import { IBotCore } from "../modules/BotCore";
 import { Context } from "telegraf";
 import { $Enums } from "@prisma/client";
 import { Render } from "../components/Render";
+import logger from "../logger";
 
 export const claimCallback = new Impact({
   name: "claim_query_callback",
