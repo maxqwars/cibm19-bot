@@ -94,4 +94,30 @@ export class Reports {
       },
     });
   }
+
+  async getVolunteerAllReportsCount(volunteerId: number) {
+    return await this._client.report.count({
+      where: {
+        volunteerId,
+      },
+    });
+  }
+
+  async getVolunteerConfirmedReportsCount(volunteerId: number) {
+    return await this._client.report.count({
+      where: {
+        volunteerId,
+        confirmed: true,
+      },
+    });
+  }
+
+  async getVolunteerNotConfirmedReportsCount(volunteerId: number) {
+    return await this._client.report.count({
+      where: {
+        volunteerId,
+        confirmed: false,
+      },
+    });
+  }
 }

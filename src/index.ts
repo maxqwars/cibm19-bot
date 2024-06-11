@@ -26,12 +26,12 @@ import { leaderboardCommand } from "./scripts/leaderboardCommand";
 import { lockdownCommand } from "./scripts/lockdownCommand";
 import { myOrganizationCommand } from "./scripts/myOrganizationCommand";
 import { profileCommand } from "./scripts/profileCommand";
-import { feedbackCommand } from './scripts/feedbackCommand'
+import { feedbackCommand } from "./scripts/feedbackCommand";
 
 // Import additional components
 import { Render } from "./components/Render";
 import { Cache } from "./components/Cache";
-import { Cryptography } from "./components/Cryptography";
+// import { Cryptography } from "./components/Cryptography";
 import { Volunteers } from "./components/Volunteers";
 import { Organizations } from "./components/Organizations";
 import { Claims } from "./components/Claims";
@@ -75,7 +75,7 @@ const SCRIPTS = [
   lockdownCommand,
   myOrganizationCommand,
   profileCommand,
-  feedbackCommand
+  feedbackCommand,
 ];
 
 const CALLBACKS = [claimCallback, reportCallback];
