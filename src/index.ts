@@ -10,6 +10,7 @@ import { BotCore } from "./modules/BotCore";
 import logger from "./logger";
 import { Telegraf } from "telegraf";
 
+// Import Query callbacks
 import { claimCallback } from "./lambdas/claimCallback";
 import { reportCallback } from "./lambdas/reportCallback";
 
@@ -31,7 +32,6 @@ import { feedbackCommand } from "./scripts/feedbackCommand";
 // Import additional components
 import { Render } from "./components/Render";
 import { Cache } from "./components/Cache";
-// import { Cryptography } from "./components/Cryptography";
 import { Volunteers } from "./components/Volunteers";
 import { Organizations } from "./components/Organizations";
 import { Claims } from "./components/Claims";
@@ -42,10 +42,11 @@ import { isSocialUrl } from "./functions/isSocialUrl";
 
 config();
 
-/* Get environment variables */
+/*
+ * Read environment variables
+ */
 const TELEGRAM_BOT_TOKEN = env["TELEGRAM_BOT_TOKEN"];
 const PRE_DEFINED_ADMINS = env["PRE_DEFINED_ADMINS"];
-// const DATA_ENCRYPTION_KEY = env["DATA_ENCRYPTION_KEY"];
 const MODE = env["MODE"] || "development";
 const MEMCACHED_HOSTS = env["MEMCACHED_HOSTS"];
 
@@ -56,7 +57,6 @@ const memClient = memjs.Client.create(MEMCACHED_HOSTS, {});
 // Init components
 const cache = new Cache(memClient);
 const render = new Render(join(cwd(), "./src/views"), cache);
-// const cryptography = new Cryptography(DATA_ENCRYPTION_KEY, cache);
 const volunteers = new Volunteers(prisma);
 const organizations = new Organizations(prisma);
 const claims = new Claims(prisma);
@@ -81,10 +81,6 @@ const SCRIPTS = [
 const CALLBACKS = [claimCallback, reportCallback];
 
 const COMPONENTS = [
-  // {
-  //   name: "cryptography",
-  //   component: cryptography,
-  // },
   {
     name: "cache",
     component: cache,
@@ -143,15 +139,21 @@ core
         Number(str),
       );
 
-      await volunteers.createWithData({
-        fio: "",
-        telegramId: ctx.from.id,
-        telegramUsername: `${ctx.from.username}`,
-        telegramName: `${ctx.from.first_name} ${ctx.from.last_name}`,
-        role: predefinedIds.find((id) => id === ctx.from.id)
-          ? $Enums.ROLE.ADMIN
-          : null,
-      });
+      try {
+        await volunteers.createWithData({
+          fio: "",
+          telegramId: ctx.from.id,
+          telegramUsername: `${ctx.from.username}`,
+          telegramName: `${ctx.from.first_name} ${ctx.from.last_name}`,
+          role: predefinedIds.find((id) => id === ctx.from.id)
+            ? $Enums.ROLE.ADMIN
+            : null,
+        });
+      } catch (err) {
+        logger.error(`Failed create empty volunteer record, reason:`);
+        logger.error(err.message);
+        return;
+      }
     }
 
     return;
