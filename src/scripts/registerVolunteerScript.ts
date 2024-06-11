@@ -31,7 +31,7 @@ const registerVolunteer = new Scriptor({
 
       const volunteerClaims = await claims.volunteerClaims(volunteer.id);
 
-      if (volunteerClaims) {
+      if (volunteerClaims.length > 0) {
         const replyMessage = await render.render(
           "claim-already-created.txt",
           {},
@@ -50,7 +50,6 @@ const registerVolunteer = new Scriptor({
   },
 });
 
-// Enter birthday date
 registerVolunteer.addStage(async (context, core) => {
   const volunteers = core.getModule("volunteers") as Volunteers;
   const render = core.getModule("render") as Render;
@@ -58,6 +57,7 @@ registerVolunteer.addStage(async (context, core) => {
   const volunteer = await volunteers.findVolunteerUnderTelegramId(
     context.from.id,
   );
+
   const fio = context.text;
 
   const updatedVolunteer = volunteers.updateVolunteerFio(volunteer.id, fio);
@@ -99,8 +99,9 @@ registerVolunteer.addStage(async (context, core) => {
 
   const updatedVolunteer = await volunteers.updateVolunteerAdultStatus(
     volunteer.id,
-    false,
+    isAdult,
   );
+
   const openOrganizations = await organizations.getUnlocked();
   let formattedOrganizations = "";
 
@@ -116,15 +117,18 @@ registerVolunteer.addStage(async (context, core) => {
 });
 
 registerVolunteer.addStage(async (context, core) => {
-  const organizations = core.getModule("organizations") as Organizations;
   const claims = core.getModule("claims") as Claims;
   const volunteers = core.getModule("volunteers") as Volunteers;
   const render = core.getModule("render") as Render;
 
-  const organizationId = Number(context.from.id);
+  const organizationId = Number(context.text.trim());
+
   const volunteer = await volunteers.findVolunteerUnderTelegramId(
     context.from.id,
   );
+
+  console.log(volunteer);
+  console.log(organizationId);
 
   const createdClaim = await claims.create({
     volunteerId: volunteer.id,

@@ -27,15 +27,14 @@ export const profileCommand = new Scriptor({
         context.from.id,
       );
 
-      const per = 54;
+      // const per = 54;
+      // for (const range in RANK_MAPPING) {
+      //   const [endNum, startNum] = range.split("-");
 
-      for (const range in RANK_MAPPING) {
-        const [endNum, startNum] = range.split("-");
-
-        if (per >= Number(startNum) && per <= Number(endNum)) {
-          console.log(RANK_MAPPING[`${endNum}-${startNum}`]);
-        }
-      }
+      //   if (per >= Number(startNum) && per <= Number(endNum)) {
+      //     console.log(RANK_MAPPING[`${endNum}-${startNum}`]);
+      //   }
+      // }
 
       if (volunteer.role === $Enums.ROLE.ADMIN) {
         const replyMessage = await render.render(
@@ -46,9 +45,9 @@ export const profileCommand = new Scriptor({
         return;
       }
 
-      const organization = await organizations.findById(
-        volunteer.organizationId,
-      );
+      const { organizationId } = await volunteers.memberOf(volunteer.id);
+
+      const organization = await organizations.findById(organizationId);
       const confirmedReportsCount =
         await reports.getVolunteerConfirmedReportsCount(volunteer.id);
       const notConfirmedReportsCount =
@@ -57,15 +56,7 @@ export const profileCommand = new Scriptor({
       const percent = (confirmedReportsCount / allReportsCount) * 100;
       let rank = "none";
 
-      for (const range in RANK_MAPPING) {
-        const [endNum, startNum] = range.split("-");
-
-        if (per >= Number(startNum) && per <= Number(endNum)) {
-          rank = RANK_MAPPING[`${endNum}-${startNum}`];
-        }
-      }
-
-      const replyMessage = await render.render("volunteer-profile", {
+      const replyMessage = await render.render("volunteer-profile.txt", {
         fio: volunteer.fio,
         username: volunteer.telegramUsername,
         displayName: volunteer.telegramName,
@@ -77,7 +68,7 @@ export const profileCommand = new Scriptor({
         reportsCount: allReportsCount,
         confirmedReportsCount: confirmedReportsCount,
         notConfirmedReportCount: notConfirmedReportsCount,
-        percent: percent,
+        percent: allReportsCount === 0 ? 0 : percent,
       });
 
       context.reply(replyMessage);

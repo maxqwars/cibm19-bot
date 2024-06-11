@@ -19,7 +19,7 @@ export const claimCallback = new Impact({
     const claims = core.getModule("claims") as Claims;
     const render = core.getModule("render") as Render;
 
-    const [action, claimId] = context["callback_query"].data.split("=");
+    const [action, claimId] = context.callbackQuery["data"].split("=");
     const {
       chat: { id: chatId },
       callbackQuery: {

@@ -26,7 +26,7 @@ export class Organizations {
   }
 
   async findById(id: number) {
-    return await this._client.organization.findFirst({
+    return await this._client.organization.findUnique({
       where: {
         id,
       },

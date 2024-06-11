@@ -70,26 +70,35 @@ export class Scriptor implements IScriptor {
     const isLastStage = stageIndex >= this._stages.length;
 
     logger.info(`[Scriptor] Processing script: ${this.name}, stage: ${stage}`);
-    const operationSuccess = await handler(context, core);
 
-    if (!operationSuccess) {
+    try {
+      const operationSuccess = await handler(context, core);
+
+      if (!operationSuccess) {
+        return;
+      }
+
+      if (isLastStage) {
+        logger.info(`[Scriptor] Script ${this.name} is end, flush session...`);
+        core.flushStage(context.from.id);
+        return;
+      }
+
+      logger.info(
+        `[Scriptor] Set next stage for script ${this.name}: ${stage}->${this._name}_${stageIndex + 1}`,
+      );
+
+      core.setSession(context.from.id, {
+        stage: `${this._name}_${stageIndex + 1}`,
+        lastMessage: context.text,
+      });
+    } catch (err) {
+      logger.error(
+        `Error while processing script "${this.name}" on stage "${stage}", reason:`,
+      );
+      logger.error(err.message);
       return;
     }
-
-    if (isLastStage) {
-      logger.info(`[Scriptor] Script ${this.name} is end, flush session...`);
-      core.flushStage(context.from.id);
-      return;
-    }
-
-    logger.info(
-      `[Scriptor] Set next stage for script ${this.name}: ${stage}->${this._name}_${stageIndex + 1}`,
-    );
-
-    core.setSession(context.from.id, {
-      stage: `${this._name}_${stageIndex + 1}`,
-      lastMessage: context.text,
-    });
   }
 
   addStage(handler: StageHandlerType): IScriptor {

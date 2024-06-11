@@ -19,6 +19,15 @@ export class Claims {
     });
   }
 
+  async create2(volunteerId: number, organizationId: number) {
+    return await this._client.claim.create({
+      data: {
+        volunteerId,
+        organizationId,
+      },
+    });
+  }
+
   async volunteerClaims(volunteerId: number) {
     return await this._client.claim.findMany({
       where: {
