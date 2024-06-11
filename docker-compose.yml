@@ -23,12 +23,12 @@ services:
     build: .
     command: "npm run deploy-and-start"
     environment:
-      DATABASE_URL: "${DATABASE_URL}"
+      DATABASE_URL: "postgresql://postgres:${POSTGRES_PASSWORD}@172.16.238.3/cibm_bot_db"
       TELEGRAM_BOT_TOKEN: "${TELEGRAM_BOT_TOKEN}"
       PRE_DEFINED_ADMINS: "${PRE_DEFINED_ADMINS}"
       DATA_ENCRIPTION_KEY: "${DATA_ENCRIPTION_KEY}"
       MODE: "${MODE}"
-      MEMCACHED_HOSTS: "${MEMCACHED_HOSTS}"
+      MEMCACHED_HOSTS: "172.16.238.5:11211"
     depends_on:
       db:
         condition: service_started

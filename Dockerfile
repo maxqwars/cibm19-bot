@@ -1,4 +1,4 @@
-FROM node:20.13
+FROM node:20.13-bookworm
 
 WORKDIR /app
 COPY package.json package-lock.json ./
