@@ -45,7 +45,7 @@ config();
 /* Get environment variables */
 const TELEGRAM_BOT_TOKEN = env["TELEGRAM_BOT_TOKEN"];
 const PRE_DEFINED_ADMINS = env["PRE_DEFINED_ADMINS"];
-const DATA_ENCRYPTION_KEY = env["DATA_ENCRYPTION_KEY"];
+// const DATA_ENCRYPTION_KEY = env["DATA_ENCRYPTION_KEY"];
 const MODE = env["MODE"] || "development";
 const MEMCACHED_HOSTS = env["MEMCACHED_HOSTS"];
 
@@ -56,7 +56,7 @@ const memClient = memjs.Client.create(MEMCACHED_HOSTS, {});
 // Init components
 const cache = new Cache(memClient);
 const render = new Render(join(cwd(), "./src/views"), cache);
-const cryptography = new Cryptography(DATA_ENCRYPTION_KEY, cache);
+// const cryptography = new Cryptography(DATA_ENCRYPTION_KEY, cache);
 const volunteers = new Volunteers(prisma);
 const organizations = new Organizations(prisma);
 const claims = new Claims(prisma);
@@ -81,10 +81,10 @@ const SCRIPTS = [
 const CALLBACKS = [claimCallback, reportCallback];
 
 const COMPONENTS = [
-  {
-    name: "cryptography",
-    component: cryptography,
-  },
+  // {
+  //   name: "cryptography",
+  //   component: cryptography,
+  // },
   {
     name: "cache",
     component: cache,

@@ -11,10 +11,10 @@ networks:
       config:
         - subnet: 172.16.238.0/24
   default:
-    driver: host
+    driver: bridge
 
 volumes:
-  cibm-bot-data:
+  cibm19-bot-data:
 
 
 services:
@@ -59,7 +59,6 @@ services:
     environment:
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
     volumes:
-      - .:/docker-entrypoint-initdb.d
       - cibm19-bot-data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
