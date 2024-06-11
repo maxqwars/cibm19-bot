@@ -16,7 +16,6 @@ networks:
 volumes:
   cibm19-bot-data:
 
-
 services:
   # CIBM bot main
   bot:
@@ -40,7 +39,6 @@ services:
       cibm_bot_net:
         ipv4_address: 172.16.238.4
       default:
-
 
   memcached:
     image: memcached:1.6.27-bookworm
