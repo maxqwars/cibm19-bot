@@ -66,6 +66,7 @@ export class BotCore implements IBotCore {
   private readonly _callbacks: IImpact[];
   private readonly _preDefinedAdmins: number[];
   private readonly _sessions: { [key: number]: SessionItem };
+  private readonly _availableCom: string[] = [];
 
   private _components: { [key: string]: any };
   private _flowKeyToScriptMap: { [key: string]: IScriptor };
@@ -171,11 +172,17 @@ export class BotCore implements IBotCore {
         });
       });
 
+      this._availableCom.push(command);
+
       logger.info(
         `[BotCore.bindScriptsCommands] Complete bind point for ${script.name}, points list: [${script.stages.join(",")}]`,
       );
     }
 
+    logger.info(`[BotCore.bindScriptsCommands] List of available commands:`);
+    for (const cmd of this._availableCom) {
+      logger.info(`[BotCore.bindScriptsCommands] Top-level command "${cmd}"`);
+    }
     return this;
   }
 

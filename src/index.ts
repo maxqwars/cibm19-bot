@@ -25,9 +25,15 @@ import { reportsCommand } from "./scripts/reportsCommand";
 import { startCommand } from "./scripts/startCommand";
 import { leaderboardCommand } from "./scripts/leaderboardCommand";
 import { lockdownCommand } from "./scripts/lockdownCommand";
-import { myOrganizationCommand } from "./scripts/myOrganizationCommand";
+import { teamCommand } from "./scripts/teamCommand";
 import { profileCommand } from "./scripts/profileCommand";
 import { feedbackCommand } from "./scripts/feedbackCommand";
+import { setCuratorCommand } from "./scripts/setCuratorCommand";
+import { broadcastCommand } from "./scripts/broadcastCommand";
+import { globalBroadcastCommand } from "./scripts/globalBroadcastCommand";
+import { rmVolunteerCommand } from "./scripts/rmVolunteerCommand";
+import { setAdminCommand } from "./scripts/setAdminCommand";
+import { rmOrganizationCommand } from "./scripts/rmOrganizationCommand";
 
 // Import additional components
 import { Render } from "./components/Render";
@@ -73,9 +79,15 @@ const SCRIPTS = [
   startCommand,
   leaderboardCommand,
   lockdownCommand,
-  myOrganizationCommand,
+  teamCommand,
   profileCommand,
   feedbackCommand,
+  setCuratorCommand,
+  broadcastCommand,
+  globalBroadcastCommand,
+  rmVolunteerCommand,
+  setAdminCommand,
+  rmOrganizationCommand,
 ];
 
 const CALLBACKS = [claimCallback, reportCallback];

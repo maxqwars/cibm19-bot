@@ -1,9 +1,9 @@
 import { Scriptor } from "../helpers/Scriptor";
 
-export const myOrganizationCommand = new Scriptor({
-  name: "my-organization",
+export const rmOrganizationCommand = new Scriptor({
+  name: "rm-organization",
   entryPoint: {
-    command: "my_org",
+    command: "rm_org",
     cb: async (context, core) => {
       return true;
     },
