@@ -123,4 +123,30 @@ export class Volunteers {
       },
     });
   }
+
+  async volunteersCount() {
+    return await this._client.volunteer.count({
+      where: {
+        role: {
+          not: null,
+        },
+      },
+    });
+  }
+
+  async paginatedRead(take: number, skip: number) {
+    return await this._client.volunteer.findMany({
+      where: {
+        role: {
+          not: null,
+        },
+      },
+      take,
+      skip,
+      select: {
+        telegramId: true,
+        role: true,
+      },
+    });
+  }
 }
