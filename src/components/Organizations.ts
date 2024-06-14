@@ -56,4 +56,13 @@ export class Organizations {
       take: 0,
     });
   }
+
+  async members(id: number) {
+    return await this._client.organization.findFirst({
+      where: { id },
+      select: {
+        members: true,
+      },
+    });
+  }
 }

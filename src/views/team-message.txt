@@ -1,0 +1,8 @@
+Name: {{name}}
+Members: {{membersCount}}
+Reports: {{allReports}}
+Confirmed: {{confirmedReports}}
+Rejected: {{rejectedReports}}
+
+Top
+{{top}}
