@@ -23,24 +23,10 @@ export const profileCommand = new Scriptor({
       const reports = core.getModule("reports") as Reports;
       const organizations = core.getModule("organizations") as Organizations;
 
-      const volunteer = await volunteers.findVolunteerUnderTelegramId(
-        context.from.id,
-      );
-
-      // const per = 54;
-      // for (const range in RANK_MAPPING) {
-      //   const [endNum, startNum] = range.split("-");
-
-      //   if (per >= Number(startNum) && per <= Number(endNum)) {
-      //     console.log(RANK_MAPPING[`${endNum}-${startNum}`]);
-      //   }
-      // }
+      const volunteer = await volunteers.findVolunteerUnderTelegramId(context.from.id);
 
       if (volunteer.role === $Enums.ROLE.ADMIN) {
-        const replyMessage = await render.render(
-          "no-support-for-you-role.txt",
-          {},
-        );
+        const replyMessage = await render.render("no-support-for-you-role.txt", {});
         context.reply(replyMessage);
         return;
       }
@@ -48,10 +34,8 @@ export const profileCommand = new Scriptor({
       const { organizationId } = await volunteers.memberOf(volunteer.id);
 
       const organization = await organizations.findById(organizationId);
-      const confirmedReportsCount =
-        await reports.getVolunteerConfirmedReportsCount(volunteer.id);
-      const notConfirmedReportsCount =
-        await reports.getVolunteerNotConfirmedReportsCount(volunteer.id);
+      const confirmedReportsCount = await reports.getVolunteerConfirmedReportsCount(volunteer.id);
+      const notConfirmedReportsCount = await reports.getVolunteerNotConfirmedReportsCount(volunteer.id);
       const allReportsCount = confirmedReportsCount + notConfirmedReportsCount;
       const percent = (confirmedReportsCount / allReportsCount) * 100;
       let rank = "none";
@@ -59,10 +43,7 @@ export const profileCommand = new Scriptor({
       for (const range in RANK_MAPPING) {
         const [endNum, startNum] = range.split("-");
 
-        if (
-          Math.round(percent) >= Number(startNum) &&
-          Math.round(percent) <= Number(endNum)
-        ) {
+        if (Math.round(percent) >= Number(startNum) && Math.round(percent) <= Number(endNum)) {
           rank = RANK_MAPPING[`${endNum}-${startNum}`];
         }
       }

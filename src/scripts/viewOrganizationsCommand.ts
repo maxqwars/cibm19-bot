@@ -13,15 +13,10 @@ export const viewOrganizationsCommand = new Scriptor({
       const volunteers = core.getModule("volunteers") as Volunteers;
       const organizations = core.getModule("organizations") as Organizations;
 
-      const { role } = await volunteers.findVolunteerUnderTelegramId(
-        context.from.id,
-      );
+      const { role } = await volunteers.findVolunteerUnderTelegramId(context.from.id);
 
       if (role !== $Enums.ROLE.ADMIN) {
-        const replyMessage = await render.render(
-          "no-access-to-operation.txt",
-          {},
-        );
+        const replyMessage = await render.render("no-access-to-operation.txt", {});
         context.reply(replyMessage);
         return false;
       }

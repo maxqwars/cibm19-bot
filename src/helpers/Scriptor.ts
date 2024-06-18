@@ -84,28 +84,21 @@ export class Scriptor implements IScriptor {
         return;
       }
 
-      logger.info(
-        `[Scriptor] Set next stage for script ${this.name}: ${stage}->${this._name}_${stageIndex + 1}`,
-      );
+      logger.info(`[Scriptor] Set next stage for script ${this.name}: ${stage}->${this._name}_${stageIndex + 1}`);
 
       core.setSession(context.from.id, {
         stage: `${this._name}_${stageIndex + 1}`,
         lastMessage: context.text,
       });
     } catch (err) {
-      logger.error(
-        `Error while processing script "${this.name}" on stage "${stage}", reason:`,
-      );
+      logger.error(`Error while processing script "${this.name}" on stage "${stage}", reason:`);
       logger.error(err.message);
       return;
     }
   }
 
   addStage(handler: StageHandlerType): IScriptor {
-    const stage =
-      this._stages.length === 0
-        ? `${this._name}_1`
-        : `${this._name}_${this._stages.length + 1}`;
+    const stage = this._stages.length === 0 ? `${this._name}_1` : `${this._name}_${this._stages.length + 1}`;
 
     this._keyToHandleMap[stage] = {
       handler,

@@ -19,23 +19,15 @@ export class Cache {
         });
       });
     } catch (err) {
-      this._log.error(
-        `[logger] Failed get cache value for key ${key}, reason:`,
-      );
+      this._log.error(`[logger] Failed get cache value for key ${key}, reason:`);
       this._log.error(err.message);
       return null;
     }
   }
 
-  async set(
-    key: string,
-    value: string,
-    expires: number,
-  ): Promise<Boolean | null> {
+  async set(key: string, value: string, expires: number): Promise<Boolean | null> {
     try {
-      this._log.info(
-        `[logger] Set cache value for key <${key}>, expires after ${expires} seconds`,
-      );
+      this._log.info(`[logger] Set cache value for key <${key}>, expires after ${expires} seconds`);
       return new Promise((resolve, reject) => {
         this._client.set(key, value, { expires }, (err, success) => {
           if (err) reject(err);
@@ -43,9 +35,7 @@ export class Cache {
         });
       });
     } catch (err) {
-      this._log.error(
-        `[logger] Failed set cache value for key ${key}, reason:`,
-      );
+      this._log.error(`[logger] Failed set cache value for key ${key}, reason:`);
       this._log.error(err.message);
       return null;
     }

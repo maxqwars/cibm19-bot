@@ -75,10 +75,7 @@ export class Reports {
     });
   }
 
-  async findReportFromVolunteerContainsPayload(
-    volunteerId: number,
-    payload: string,
-  ) {
+  async findReportFromVolunteerContainsPayload(volunteerId: number, payload: string) {
     return await this._client.report.findFirst({
       where: {
         volunteerId: volunteerId,

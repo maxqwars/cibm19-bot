@@ -30,14 +30,12 @@ export class Render {
       return cachedTemp.toString();
     }
 
-    const readFilePromise: Promise<string | void> = new Promise(
-      (resolve, reject) => {
-        readFile(join(this._viewsDirPath, template), (err, data) => {
-          if (err) reject(err);
-          resolve(data.toString());
-        });
-      },
-    );
+    const readFilePromise: Promise<string | void> = new Promise((resolve, reject) => {
+      readFile(join(this._viewsDirPath, template), (err, data) => {
+        if (err) reject(err);
+        resolve(data.toString());
+      });
+    });
 
     const result = await readFilePromise;
 

@@ -41,20 +41,13 @@ export interface IBotCore {
     onErr: OnProblemFunctionType,
   ): IBotCore;
   bindOnCallbackQueryEvent(bot: Telegraf<Context<Update>>): IBotCore;
-  rawMessage(
-    context: Context,
-    noScriptCb: OnProblemFunctionType,
-    onErr: OnProblemFunctionType,
-  ): Promise<void>;
+  rawMessage(context: Context, noScriptCb: OnProblemFunctionType, onErr: OnProblemFunctionType): Promise<void>;
   callbackQuery(context: Context<Update.CallbackQueryUpdate>): Promise<void>;
   flushStage(telegramId: number): void;
   getSession(telegramId: number): SessionItem;
   addModule<T>(name: string, instance: T): IBotCore;
   getModule<T>(name: string): T | null;
-  addMiddleware(
-    bot: Telegraf<Context<Update>>,
-    middleware: MiddlewareFunctionType,
-  ): IBotCore;
+  addMiddleware(bot: Telegraf<Context<Update>>, middleware: MiddlewareFunctionType): IBotCore;
   sessions: { [key: number]: SessionItem };
   init(bot: Telegraf<Context<Update>>): IBotCore;
   setSession(telegramId: number, session: SessionItem): SessionItem;
@@ -116,10 +109,7 @@ export class BotCore implements IBotCore {
     return this._sessions;
   }
 
-  addMiddleware(
-    bot: Telegraf<Context<Update>>,
-    middleware: MiddlewareFunctionType,
-  ): IBotCore {
+  addMiddleware(bot: Telegraf<Context<Update>>, middleware: MiddlewareFunctionType): IBotCore {
     bot.use((context: Context, next) => {
       middleware(context, this)
         .then(() => next())
@@ -149,10 +139,7 @@ export class BotCore implements IBotCore {
   }
 
   bindOnCallbackQueryEvent(bot: Telegraf<Context<Update>>): IBotCore {
-    bot.on(
-      "callback_query",
-      async (context) => await this.callbackQuery(context),
-    );
+    bot.on("callback_query", async (context) => await this.callbackQuery(context));
     return this;
   }
 
@@ -160,9 +147,7 @@ export class BotCore implements IBotCore {
     for (const script of this._scripts) {
       const { command, cb } = script.entryPoint;
 
-      logger.info(
-        `[BotCore.bindScriptsCommands] Bind command /${command} for script ${script.name}`,
-      );
+      logger.info(`[BotCore.bindScriptsCommands] Bind command /${command} for script ${script.name}`);
 
       bot.command(command, async (context: Context) => {
         await cb(context, this);
@@ -195,9 +180,7 @@ export class BotCore implements IBotCore {
   }
 
   getSession(telegramId: number): SessionItem {
-    return this._sessions[telegramId]
-      ? this._sessions[telegramId]
-      : { stage: "", lastMessage: "" };
+    return this._sessions[telegramId] ? this._sessions[telegramId] : { stage: "", lastMessage: "" };
   }
 
   async rawMessage(
@@ -215,14 +198,10 @@ export class BotCore implements IBotCore {
     }
 
     try {
-      logger.info(
-        `[BotCore.rawMessage] Executing script for stage: ${stage}...`,
-      );
+      logger.info(`[BotCore.rawMessage] Executing script for stage: ${stage}...`);
       await script.execute(context, this);
     } catch (err) {
-      logger.error(
-        `[BotCore.rawMessage] Error while execution stage '${stage}' script, reason:`,
-      );
+      logger.error(`[BotCore.rawMessage] Error while execution stage '${stage}' script, reason:`);
       logger.error(err.message);
       this.flushStage(fromId);
       await onErr(context, this);
@@ -230,18 +209,12 @@ export class BotCore implements IBotCore {
     }
   }
 
-  async callbackQuery(
-    context: Context<Update.CallbackQueryUpdate>,
-  ): Promise<void> {
+  async callbackQuery(context: Context<Update.CallbackQueryUpdate>): Promise<void> {
     const { data } = context.update.callback_query as CallbackQuery.DataQuery;
 
-    logger.info(
-      `[BotCore.callbackQuery] Incoming callback query from ${context.from.id}, with data <${data}>`,
-    );
+    logger.info(`[BotCore.callbackQuery] Incoming callback query from ${context.from.id}, with data <${data}>`);
 
-    const lambda = this._callbacks.find((lambda) =>
-      lambda.signature.test(data),
-    );
+    const lambda = this._callbacks.find((lambda) => lambda.signature.test(data));
 
     if (!lambda) {
       context.telegram.deleteMessage(context.chat.id, context.msgId);
@@ -253,9 +226,7 @@ export class BotCore implements IBotCore {
       await lambda.callback(context, this);
     } catch (err) {
       context.telegram.deleteMessage(context.chat.id, context.msgId);
-      logger.error(
-        `[BotCore.callbackQuery] Error while processing query <${data}>, reason:`,
-      );
+      logger.error(`[BotCore.callbackQuery] Error while processing query <${data}>, reason:`);
       logger.error(err.message);
       return;
     }
@@ -268,14 +239,10 @@ export class BotCore implements IBotCore {
       for (const stage of script.stages) {
         this._flowKeyToScriptMap[stage] = script;
 
-        logger.info(
-          `[BotCore.generateStageToScriptorMap] Add stage ${stage}->${script.name}`,
-        );
+        logger.info(`[BotCore.generateStageToScriptorMap] Add stage ${stage}->${script.name}`);
       }
 
-      logger.info(
-        `[BotCore.generateStageToScriptorMap] Complete load stages for ${script.name}`,
-      );
+      logger.info(`[BotCore.generateStageToScriptorMap] Complete load stages for ${script.name}`);
     }
 
     return this;

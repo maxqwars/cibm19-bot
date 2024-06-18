@@ -17,9 +17,7 @@ const claimsCommandConstruct = new Scriptor({
       const render = core.getModule("render") as Render;
       const organizations = core.getModule("organizations") as Organizations;
 
-      const volunteer = await volunteers.findVolunteerUnderTelegramId(
-        context.from.id,
-      );
+      const volunteer = await volunteers.findVolunteerUnderTelegramId(context.from.id);
 
       // Administrator see all claims
       if (volunteer.role === $Enums.ROLE.ADMIN) {
@@ -39,10 +37,7 @@ const claimsCommandConstruct = new Scriptor({
       }
 
       if (volunteer.role !== $Enums.ROLE.CURATOR) {
-        const replyMessage = await render.render(
-          "no-access-to-operation.txt",
-          {},
-        );
+        const replyMessage = await render.render("no-access-to-operation.txt", {});
         context.reply(replyMessage);
         return true;
       }
@@ -57,9 +52,7 @@ const claimsCommandConstruct = new Scriptor({
       }
 
       for (const claim of claimsArr) {
-        const claimInitiatorData = await volunteers.findVolunteerUnderId(
-          claim.volunteerId,
-        );
+        const claimInitiatorData = await volunteers.findVolunteerUnderId(claim.volunteerId);
 
         const messagePayload = await render.render("claim-preview.txt", {
           telegramUsername: claimInitiatorData.telegramUsername,
@@ -102,9 +95,7 @@ claimsCommandConstruct.addStage(async (context, core) => {
   }
 
   for (const claim of claimsArr) {
-    const claimInitiatorData = await volunteers.findVolunteerUnderId(
-      claim.volunteerId,
-    );
+    const claimInitiatorData = await volunteers.findVolunteerUnderId(claim.volunteerId);
 
     const organizationData = await organizations.findById(claim.organizationId);
 

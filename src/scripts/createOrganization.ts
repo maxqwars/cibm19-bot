@@ -13,23 +13,15 @@ const createOrganizationScript = new Scriptor({
       const render = core.getModule("render") as Render;
       const volunteers = core.getModule("volunteers") as Volunteers;
 
-      const volunteer = await volunteers.findVolunteerUnderTelegramId(
-        context.from.id,
-      );
+      const volunteer = await volunteers.findVolunteerUnderTelegramId(context.from.id);
 
       if (volunteer.role !== $Enums.ROLE.ADMIN) {
-        const replyMessage = await render.render(
-          "no-access-to-operation.txt",
-          {},
-        );
+        const replyMessage = await render.render("no-access-to-operation.txt", {});
         context.reply(replyMessage);
         return;
       }
 
-      const replyMessage = await render.render(
-        "enter-new-organization-name.txt",
-        {},
-      );
+      const replyMessage = await render.render("enter-new-organization-name.txt", {});
       context.reply(replyMessage);
       return true;
     },
@@ -42,9 +34,7 @@ createOrganizationScript.addStage(async (context, core) => {
   const render = core.getModule("render") as Render;
   const volunteers = core.getModule("volunteers") as Volunteers;
 
-  const volunteer = await volunteers.findVolunteerUnderTelegramId(
-    context.from.id,
-  );
+  const volunteer = await volunteers.findVolunteerUnderTelegramId(context.from.id);
 
   if (volunteer.role !== $Enums.ROLE.ADMIN) {
     const replyMessage = await render.render("no-access-to-operation.txt", {});

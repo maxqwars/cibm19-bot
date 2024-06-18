@@ -3,7 +3,6 @@ import { Reports } from "../components/Reports";
 import { Scriptor } from "../helpers/Scriptor";
 import { Volunteers } from "../components/Volunteers";
 import { $Enums } from "@prisma/client";
-import dayjs from "dayjs";
 import { Markup } from "telegraf";
 
 export const reportsCommand = new Scriptor({
@@ -11,23 +10,13 @@ export const reportsCommand = new Scriptor({
   entryPoint: {
     command: "reports",
     cb: async (context, core) => {
-      const {
-        reply,
-        from: { id },
-        telegram: { sendMessage },
-      } = context;
-
       const render = (await core.getModule("render")) as Render;
       const reports = (await core.getModule("reports")) as Reports;
       const volunteers = (await core.getModule("volunteers")) as Volunteers;
-
-      const volunteer = await volunteers.findVolunteerUnderTelegramId(id);
+      const volunteer = await volunteers.findVolunteerUnderTelegramId(context.from.id);
 
       if (volunteer.role !== $Enums.ROLE.ADMIN) {
-        const replyMessage = await render.render(
-          "no-access-to-operation.txt",
-          {},
-        );
+        const replyMessage = await render.render("no-access-to-operation.txt", {});
         context.reply(replyMessage);
         return true;
       }
@@ -49,7 +38,7 @@ export const reportsCommand = new Scriptor({
         });
 
         context.telegram.sendMessage(
-          id,
+          context.from.id,
           replyMessage,
           Markup.inlineKeyboard([
             Markup.button.callback("✅", `confirm_report=${report.hash}`),

@@ -14,9 +14,7 @@ export class Cryptography {
     this._key = Buffer.from(key, "utf8");
     this._iv = crypto.randomBytes(16);
 
-    logger.info(
-      `[Cryptography.constructor] Encryption key length ${this._key.length}`,
-    );
+    logger.info(`[Cryptography.constructor] Encryption key length ${this._key.length}`);
   }
 
   encrypt(val: string) {
@@ -26,11 +24,7 @@ export class Cryptography {
   }
 
   decrypt(val: string) {
-    const decipher = crypto.createDecipheriv(
-      this._algorithm,
-      this._key,
-      this._iv,
-    );
+    const decipher = crypto.createDecipheriv(this._algorithm, this._key, this._iv);
 
     let decrypted = decipher.update(val, "hex", "utf8");
     return (decrypted += decipher.final("utf8"));

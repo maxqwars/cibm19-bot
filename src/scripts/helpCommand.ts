@@ -10,9 +10,7 @@ export const helpCommand = new Scriptor({
       const render = core.getModule("render") as Render;
       const volunteers = core.getModule("volunteers") as Volunteers;
 
-      const currentVolunteer = await volunteers.findVolunteerUnderTelegramId(
-        context.from.id,
-      );
+      const currentVolunteer = await volunteers.findVolunteerUnderTelegramId(context.from.id);
 
       switch (currentVolunteer.role) {
         case "ADMIN": {

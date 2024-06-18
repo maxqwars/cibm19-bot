@@ -11,10 +11,7 @@ import logger from "../logger";
 export const claimCallback = new Impact({
   name: "claim_query_callback",
   signature: new RegExp(/(accept|reject)_claim(=\d*)/gm),
-  callback: async (
-    context: Context<Update.CallbackQueryUpdate>,
-    core: IBotCore,
-  ) => {
+  callback: async (context: Context<Update.CallbackQueryUpdate>, core: IBotCore) => {
     // Get components from core
     const volunteers = core.getModule("volunteers") as Volunteers;
     const claims = core.getModule("claims") as Claims;
@@ -29,9 +26,7 @@ export const claimCallback = new Impact({
       },
     } = context;
 
-    const { id, volunteerId, organizationId } = await claims.claimDetails(
-      Number(claimId),
-    );
+    const { id, volunteerId, organizationId } = await claims.claimDetails(Number(claimId));
 
     const initiatorData = await volunteers.findVolunteerUnderId(volunteerId);
 
@@ -45,12 +40,7 @@ export const claimCallback = new Impact({
         claimStatus: "❎",
       });
 
-      context.telegram.editMessageText(
-        chatId,
-        message_id,
-        inline_message_id,
-        messageContent,
-      );
+      context.telegram.editMessageText(chatId, message_id, inline_message_id, messageContent);
 
       return;
     }
@@ -68,22 +58,11 @@ export const claimCallback = new Impact({
       claimStatus: "✅",
     });
 
-    context.telegram.editMessageText(
-      chatId,
-      message_id,
-      inline_message_id,
-      messageContent,
-    );
+    context.telegram.editMessageText(chatId, message_id, inline_message_id, messageContent);
 
     // Send volunteer message
-    const initiatorMessageContent = await render.render(
-      "volunteer-welcome-message.txt",
-      { claimId: id },
-    );
-    context.telegram.sendMessage(
-      Number(initiatorData.telegramId),
-      initiatorMessageContent,
-    );
+    const initiatorMessageContent = await render.render("volunteer-welcome-message.txt", { claimId: id });
+    context.telegram.sendMessage(Number(initiatorData.telegramId), initiatorMessageContent);
 
     return;
   },

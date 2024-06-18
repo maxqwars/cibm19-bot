@@ -15,18 +15,10 @@ const broadcast = new Scriptor({
     cb: async (context, core) => {
       const volunteers = core.getModule("volunteers") as Volunteers;
       const render = core.getModule("render") as Render;
-      const currentVolunteer = await volunteers.findVolunteerUnderTelegramId(
-        context.from.id,
-      );
+      const currentVolunteer = await volunteers.findVolunteerUnderTelegramId(context.from.id);
 
-      if (
-        currentVolunteer.role === $Enums.ROLE.VOLUNTEER ||
-        !currentVolunteer.role
-      ) {
-        const replyMsgText = await render.render(
-          "no-access-to-operation.txt",
-          {},
-        );
+      if (currentVolunteer.role === $Enums.ROLE.VOLUNTEER || !currentVolunteer.role) {
+        const replyMsgText = await render.render("no-access-to-operation.txt", {});
         context.reply(replyMsgText);
         return true;
       }
@@ -37,10 +29,7 @@ const broadcast = new Scriptor({
         return true;
       }
 
-      const replyMsgText = await render.render(
-        "send-text-for-broadcast-message.txt",
-        {},
-      );
+      const replyMsgText = await render.render("send-text-for-broadcast-message.txt", {});
       context.reply(replyMsgText);
       return true;
     },
@@ -51,18 +40,14 @@ broadcast.addStage(async (context, core) => {
   const volunteers = core.getModule("volunteers") as Volunteers;
   const render = core.getModule("render") as Render;
   const organizations = core.getModule("organizations") as Organizations;
-  const currentVolunteer = await volunteers.findVolunteerUnderTelegramId(
-    context.from.id,
-  );
+  const currentVolunteer = await volunteers.findVolunteerUnderTelegramId(context.from.id);
 
   if (currentVolunteer.role === $Enums.ROLE.ADMIN) {
     context.reply(`Not implemented`);
     return true;
   }
 
-  const organizationMembers = await organizations.members(
-    currentVolunteer.organizationId,
-  );
+  const organizationMembers = await organizations.members(currentVolunteer.organizationId);
   const volunteersCount = organizationMembers.members.length;
   const broadcastMsgText = await render.render("broadcast-message.txt", {
     broadcastMessage: context.text.trim(),
@@ -76,18 +61,12 @@ broadcast.addStage(async (context, core) => {
   pages = volunteersCount % PER_ITERATION_COUNT === 0 ? 0 : 1;
 
   while (index <= pages) {
-    const volunteersData = await volunteers.paginatedRead(
-      PER_ITERATION_COUNT,
-      skip,
-    );
+    const volunteersData = await volunteers.paginatedRead(PER_ITERATION_COUNT, skip);
 
     for (const volunteer of volunteersData) {
       if (volunteer.role === $Enums.ROLE.ADMIN) continue;
 
-      context.telegram.sendMessage(
-        Number(volunteer.telegramId),
-        broadcastMsgText,
-      );
+      context.telegram.sendMessage(Number(volunteer.telegramId), broadcastMsgText);
     }
 
     index = index + 1;

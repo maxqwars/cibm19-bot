@@ -142,14 +142,10 @@ core
   })
   .addMiddleware(bot, async (ctx, core) => {
     const volunteers = core.getModule("volunteers") as Volunteers;
-    const candidate = await volunteers.findVolunteerUnderTelegramId(
-      ctx.from.id,
-    );
+    const candidate = await volunteers.findVolunteerUnderTelegramId(ctx.from.id);
 
     if (!candidate) {
-      const predefinedIds = PRE_DEFINED_ADMINS.split(",").map((str) =>
-        Number(str),
-      );
+      const predefinedIds = PRE_DEFINED_ADMINS.split(",").map((str) => Number(str));
 
       try {
         await volunteers.createWithData({
@@ -157,9 +153,7 @@ core
           telegramId: ctx.from.id,
           telegramUsername: `${ctx.from.username}`,
           telegramName: `${ctx.from.first_name} ${ctx.from.last_name}`,
-          role: predefinedIds.find((id) => id === ctx.from.id)
-            ? $Enums.ROLE.ADMIN
-            : null,
+          role: predefinedIds.find((id) => id === ctx.from.id) ? $Enums.ROLE.ADMIN : null,
         });
       } catch (err) {
         logger.error(`Failed create empty volunteer record, reason:`);
@@ -179,25 +173,15 @@ core
       const render = core.getModule("render") as Render;
       const volunteers = core.getModule("volunteers") as Volunteers;
 
-      const volunteer = await volunteers.findVolunteerUnderTelegramId(
-        ctx.from.id,
-      );
+      const volunteer = await volunteers.findVolunteerUnderTelegramId(ctx.from.id);
 
-      logger.info(
-        `[NO SCRIPT] Is social link: ${isSocialUrl(ctx.text.trim())}`,
-      );
+      logger.info(`[NO SCRIPT] Is social link: ${isSocialUrl(ctx.text.trim())}`);
 
       if (isSocialUrl(ctx.text.trim())) {
-        const candidate = await reports.findReportFromVolunteerContainsPayload(
-          volunteer.id,
-          ctx.text.trim(),
-        );
+        const candidate = await reports.findReportFromVolunteerContainsPayload(volunteer.id, ctx.text.trim());
 
         if (candidate) {
-          const replyContent = await render.render(
-            "report-already-created.txt",
-            {},
-          );
+          const replyContent = await render.render("report-already-created.txt", {});
           ctx.reply(replyContent);
           return;
         }
@@ -217,10 +201,7 @@ core
     },
     async (ctx, core) => {
       const render = core.getModule("render") as Render;
-      const contentMessage = await render.render(
-        "error-while-script-proc.txt",
-        {},
-      );
+      const contentMessage = await render.render("error-while-script-proc.txt", {});
       ctx.reply(contentMessage);
     },
   )

@@ -149,4 +149,12 @@ export class Volunteers {
       },
     });
   }
+
+  async findUsingUsername(telegramUsername: string) {
+    return await this._client.volunteer.findFirst({
+      where: {
+        telegramUsername,
+      },
+    });
+  }
 }

@@ -16,20 +16,14 @@ export const teamCommand = new Scriptor({
       const organizations = core.getModule("organizations") as Organizations;
       const reports = core.getModule("reports") as Reports;
 
-      const volunteer = await volunteers.findVolunteerUnderTelegramId(
-        context.from.id,
-      );
+      const volunteer = await volunteers.findVolunteerUnderTelegramId(context.from.id);
       const targetOrganizationId = volunteer.organizationId;
 
       const { name } = await organizations.findById(targetOrganizationId);
       const orgAllMembers = await organizations.members(targetOrganizationId);
       const orgMembersCount = orgAllMembers.members.length;
-      const members = orgAllMembers.members.filter(
-        (member) => member.role === $Enums.ROLE.VOLUNTEER,
-      );
-      const curators = orgAllMembers.members.filter(
-        (member) => member.role === $Enums.ROLE.CURATOR,
-      );
+      const members = orgAllMembers.members.filter((member) => member.role === $Enums.ROLE.VOLUNTEER);
+      const curators = orgAllMembers.members.filter((member) => member.role === $Enums.ROLE.CURATOR);
 
       // Metrics
       let summaryReportsCount = 0;
@@ -40,25 +34,19 @@ export const teamCommand = new Scriptor({
 
       /* Calculate summary reports count */
       for (const member of orgAllMembers.members) {
-        const reportsCount = await reports.getVolunteerAllReportsCount(
-          member.id,
-        );
+        const reportsCount = await reports.getVolunteerAllReportsCount(member.id);
         summaryReportsCount += reportsCount;
       }
 
       /* Calculate confirmed reports count */
       for (const member of orgAllMembers.members) {
-        const reportsCount = await reports.getVolunteerConfirmedReportsCount(
-          member.id,
-        );
+        const reportsCount = await reports.getVolunteerConfirmedReportsCount(member.id);
         confirmedReportsCount += reportsCount;
       }
 
       /* Calculate rejected report count */
       for (const member of orgAllMembers.members) {
-        const reportsCount = await reports.getVolunteerNotConfirmedReportsCount(
-          member.id,
-        );
+        const reportsCount = await reports.getVolunteerNotConfirmedReportsCount(member.id);
         rejectedReportsCount += reportsCount;
       }
 
@@ -67,8 +55,7 @@ export const teamCommand = new Scriptor({
 
       for (const member of orgAllMembers.members) {
         const all = (await reports.getVolunteerAllReportsCount(member.id)) || 0;
-        const confirm =
-          (await reports.getVolunteerConfirmedReportsCount(member.id)) || 0;
+        const confirm = (await reports.getVolunteerConfirmedReportsCount(member.id)) || 0;
 
         logger.info(`${member.telegramName} ${confirm} ${all}`);
 
