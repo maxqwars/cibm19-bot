@@ -28,7 +28,7 @@ export const helpCommand = new Scriptor({
         }
 
         case "VOLUNTEER": {
-          const reply = await render.render("help-for-curator.txt", {});
+          const reply = await render.render("help-for-volunteer.txt", {});
           context.reply(reply);
           return true;
         }
