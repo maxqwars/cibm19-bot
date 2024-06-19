@@ -157,4 +157,12 @@ export class Volunteers {
       },
     });
   }
+
+  async administrators() {
+    return await this._client.volunteer.findMany({
+      where: {
+        role: "ADMIN",
+      },
+    });
+  }
 }
