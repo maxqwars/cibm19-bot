@@ -1,16 +1,21 @@
-import { PrismaClient } from "@prisma/client";
+import { Organization, PrismaClient } from "@prisma/client";
 import logger from "../logger";
+import { Cache } from "./Cache";
 
 type OrganizationCreateDataDto = {
   name: string;
   domain: string;
 };
 
+const ORG_CACHE_LIFETIME = 1000 * 60 * 60 * 5;
+
 export class Organizations {
   private readonly _client: PrismaClient;
+  private readonly _cache: Cache;
 
-  constructor(prisma: PrismaClient) {
+  constructor(prisma: PrismaClient, cache: Cache) {
     this._client = prisma;
+    this._cache = cache;
   }
 
   async create(dto: OrganizationCreateDataDto) {
@@ -26,11 +31,20 @@ export class Organizations {
   }
 
   async findById(id: number) {
-    return await this._client.organization.findUnique({
+    const serializedOrgData = (await this._cache.get(`org_data_${id}`)).toString();
+
+    if (serializedOrgData) {
+      return JSON.parse(serializedOrgData) as Organization;
+    }
+
+    const orgData = this._client.organization.findUnique({
       where: {
         id,
       },
     });
+
+    await this._cache.set(`org_data_${id}`, JSON.stringify(orgData), ORG_CACHE_LIFETIME);
+    return orgData;
   }
 
   async getAll() {
