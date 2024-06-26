@@ -12,32 +12,31 @@
 | `MODE`               | development/production |             |
 | `MEMCACHED_HOSTS`    | Array<string>          |             |
 
-
 ## Commands implementation status (list)
 
 🟢 - implmented, 🟡 - partical (or bugs) implemented, 🔴 - not implemented
 
 | Status | Command       | Description |
 | ------ | ------------- | ----------- |
-| 🟢      | /help         | Lorem       |
-| 🟢      | /create_org   | Lorem       |
-| 🟢      | /view_org     | Lorem       |
-| 🟢      | /register     | Lorem       |
-| 🟡      | /claims       | Lorem       |
-| 🟢      | /privacy      | Lorem       |
-| 🟡      | /reports      | Lorem       |
-| 🟢      | /start        | Lorem       |
-| 🔴      | /leaderboard  | Lorem       |
-| 🔴      | /lockdown     | Lorem       |
-| 🟢      | /team         | Lorem       |
-| 🟢      | /profile      | Lorem       |
-| 🟢      | /feedback     | Lorem       |
-| 🟢      | /set_curator  | Lorem       |
-| 🟡      | /broadcast    | Lorem       |
-| 🟢      | /g_broadcast  | Lorem       |
-| 🔴      | /rm_volunteer | Lorem       |
-| 🟢      | /set_admin    | Lorem       |
-| 🔴      | /rm_org       | Lorem       |
+| 🟢     | /help         | Lorem       |
+| 🟢     | /create_org   | Lorem       |
+| 🟢     | /view_org     | Lorem       |
+| 🟢     | /register     | Lorem       |
+| 🟡     | /claims       | Lorem       |
+| 🟢     | /privacy      | Lorem       |
+| 🟡     | /reports      | Lorem       |
+| 🟢     | /start        | Lorem       |
+| 🔴     | /leaderboard  | Lorem       |
+| 🔴     | /lockdown     | Lorem       |
+| 🟢     | /team         | Lorem       |
+| 🟢     | /profile      | Lorem       |
+| 🟢     | /feedback     | Lorem       |
+| 🟢     | /set_curator  | Lorem       |
+| 🟡     | /broadcast    | Lorem       |
+| 🟢     | /g_broadcast  | Lorem       |
+| 🔴     | /rm_volunteer | Lorem       |
+| 🟢     | /set_admin    | Lorem       |
+| 🔴     | /rm_org       | Lorem       |
 
 ## Deployment
 
