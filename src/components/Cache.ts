@@ -44,7 +44,7 @@ export class Cache {
   async clean(key: string) {
     try {
       return new Promise((resolve, reject) => {
-        this._client.set(key, null, (err, success) => {
+        this._client.set(key, "", { expires: 1000 }, (err, success) => {
           if (err) reject(err);
           resolve(success);
         });

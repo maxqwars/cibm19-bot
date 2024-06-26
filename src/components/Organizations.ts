@@ -31,19 +31,11 @@ export class Organizations {
   }
 
   async findById(id: number) {
-    const serializedOrgData = (await this._cache.get(`org_data_${id}`)).toString();
-
-    if (serializedOrgData) {
-      return JSON.parse(serializedOrgData) as Organization;
-    }
-
     const orgData = this._client.organization.findUnique({
       where: {
         id,
       },
     });
-
-    await this._cache.set(`org_data_${id}`, JSON.stringify(orgData), ORG_CACHE_LIFETIME);
     return orgData;
   }
 
