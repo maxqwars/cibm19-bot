@@ -63,7 +63,7 @@ const memClient = memjs.Client.create(MEMCACHED_HOSTS, {});
 // Init components
 const cache = new Cache(memClient);
 const render = new Render(join(cwd(), "./src/views"), cache);
-const volunteers = new Volunteers(prisma);
+const volunteers = new Volunteers(prisma, cache);
 const organizations = new Organizations(prisma);
 const claims = new Claims(prisma);
 const reports = new Reports(prisma);
