@@ -47,13 +47,14 @@ registerVolunteer.addStage(async (context, core) => {
   const fio = context.text;
 
   const updatedVolunteer = volunteers.updateVolunteerFio(volunteer.id, fio);
+
   if (!updatedVolunteer) {
     const replyMessage = await render.render("error-while-script-proc.txt", {});
     context.reply(replyMessage);
     return false;
   }
 
-  const replyMessage = await render.render("error-while-script-proc.txt", {});
+  const replyMessage = await render.render("enter-birthday-date.txt", {});
   context.reply(replyMessage);
   return true;
 });
@@ -104,21 +105,18 @@ registerVolunteer.addStage(async (context, core) => {
 
   const volunteer = await volunteers.findVolunteerUnderTelegramId(context.from.id);
 
-  console.log(volunteer);
-  console.log(organizationId);
-
   const createdClaim = await claims.create({
     volunteerId: volunteer.id,
     organizationId,
   });
 
-  if (createdClaim) {
-    const replyContent = await render.render("error-while-script-proc", {});
+  if (!createdClaim) {
+    const replyContent = await render.render("error-while-script-proc.txt", {});
     context.reply(replyContent);
     return true;
   }
 
-  const replyContent = await render.render("claim-n-created", {
+  const replyContent = await render.render("claim-n-created.txt", {
     claimId: createdClaim.id,
   });
   context.reply(replyContent);

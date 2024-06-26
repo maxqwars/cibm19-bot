@@ -96,11 +96,12 @@ claimsCommandConstruct.addStage(async (context, core) => {
 
   for (const claim of claimsArr) {
     const claimInitiatorData = await volunteers.findVolunteerUnderId(claim.volunteerId);
-
     const organizationData = await organizations.findById(claim.organizationId);
 
+    console.log(claimInitiatorData);
+
     const messagePayload = await render.render("claim-preview-admin.txt", {
-      telegramUsername: claimInitiatorData.telegramUsername,
+      telegramUsername: claimInitiatorData.telegramUsername ? `@${claimInitiatorData.telegramUsername}` : "null",
       volunteerFio: claimInitiatorData.fio,
       telegramName: claimInitiatorData.telegramName,
       organizationName: organizationData.name,
