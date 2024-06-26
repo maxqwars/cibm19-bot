@@ -23,7 +23,7 @@ Source code of Telegram bot for organizing the work of volunteers and volunteers
 | ------ | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 🟢      | /help         | Help output by bot commands depending on user role                                                                                                                  |
 | 🟢      | /create_org   | Administrative command to set up the organization                                                                                                                   |
-| 🟢      | /view_org     | Admin command outputs list of organizations     А                                                                                                                    |
+| 🟢      | /view_org     | Admin command outputs list of organizations А                                                                                                                       |
 | 🟢      | /register     | Command to register a user as a volunteer                                                                                                                           |
 | 🟡      | /claims       | Command for curators and administrators output a list of claims to join the organization                                                                            |
 | 🟢      | /privacy      | Display the text of the privacy policy                                                                                                                              |
