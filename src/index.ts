@@ -64,10 +64,13 @@ const memClient = memjs.Client.create(MEMCACHED_HOSTS, {});
 const cache = new Cache(memClient);
 const render = new Render(join(cwd(), "./src/views"), cache);
 const volunteers = new Volunteers(prisma, cache);
-const organizations = new Organizations(prisma);
+const organizations = new Organizations(prisma, cache);
 const claims = new Claims(prisma);
 const reports = new Reports(prisma);
 
+/*
+ * Define used scripts
+ */
 const SCRIPTS = [
   helpCommand,
   createOrganizationScript,
@@ -90,8 +93,14 @@ const SCRIPTS = [
   rmOrganizationCommand,
 ];
 
+/*
+ * Define used callback`s
+ */
 const CALLBACKS = [claimCallback, reportCallback];
 
+/*
+ * Define used components (modules)
+ */
 const COMPONENTS = [
   {
     name: "cache",
@@ -156,7 +165,7 @@ core
           role: predefinedIds.find((id) => id === ctx.from.id) ? $Enums.ROLE.ADMIN : null,
         });
       } catch (err) {
-        logger.error(`Failed create empty volunteer record, reason:`);
+        logger.error(`[top-level middleware] Failed create empty volunteer record, reason:`);
         logger.error(err.message);
         return;
       }
