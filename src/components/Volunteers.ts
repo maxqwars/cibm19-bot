@@ -11,7 +11,6 @@ type VolunteerCreateDataDto = {
 };
 
 const VOLUNTEER_DATA_LIFETIME = 1000 * 60 * 60 * 3; // Total 3 hours
-const TG_ID_TO_VOLUNTEER_BIND_LIFETIME = 1000 * 60 * 60 * 12; // Total 12 hours
 const TG_ID_TO_SYS_ID_BIND_LIFETIME = 1000 * 60 * 60 * 12; // Total 12 hours
 
 export class Volunteers {
@@ -39,8 +38,7 @@ export class Volunteers {
   }
 
   private async _getVolunteerDataWithCache(id: number) {
-
-    if (id === 0) return null
+    if (id === 0) return null;
 
     const cache = await this._cache.get(`volunteer_data_${id}`);
 
@@ -48,7 +46,7 @@ export class Volunteers {
       logger.info(`[Volonteers._getVolunteerDataWithCache] Cache for volonteer ${id} not found, generate cache...`);
       const volunteerData = await this._client.volunteer.findFirst({ where: { id } });
 
-      if (!volunteerData) return null
+      if (!volunteerData) return null;
 
       const createdCache = await this._cache.set(
         `volunteer_data_${id}`,

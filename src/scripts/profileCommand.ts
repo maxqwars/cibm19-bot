@@ -4,6 +4,7 @@ import { Render } from "../components/Render";
 import { Reports } from "../components/Reports";
 import { $Enums } from "@prisma/client";
 import { Organizations } from "../components/Organizations";
+import dayjs from "dayjs";
 
 const RANK_MAPPING = {
   "100-100": "🏅",
@@ -52,7 +53,8 @@ export const profileCommand = new Scriptor({
         fio: volunteer.fio,
         username: volunteer.telegramUsername,
         displayName: volunteer.telegramName,
-        joinAt: volunteer.createdAt.toString(),
+        // joinAt: volunteer.createdAt.toString(),
+        joinAt: dayjs(volunteer.createdAt).format("DD.MM.YYYY"),
         role: volunteer.role,
         rank: rank,
         organization: organization.name,

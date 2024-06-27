@@ -139,4 +139,29 @@ export class Reports {
       },
     });
   }
+
+  async findFirstUsingHash(hash: string) {
+    return await this._client.report.findFirst({
+      where: { hash },
+    });
+  }
+
+  async findAllUsingHash(hash: string) {
+    return await this._client.report.findMany({
+      where: {
+        hash,
+      },
+    });
+  }
+
+  async findSendedVolunteers(hash: string) {
+    return await this._client.report.findMany({
+      where: {
+        hash,
+      },
+      select: {
+        volunteerId: true,
+      },
+    });
+  }
 }

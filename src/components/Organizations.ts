@@ -39,8 +39,8 @@ export class Organizations {
       });
       return orgData;
     } catch (err) {
-      logger.error(`[Organizations.findById] Failed get organization by ID, reason ⬇️`)
-      logger.error(err.message)
+      logger.error(`[Organizations.findById] Failed get organization by ID, reason ⬇️`);
+      logger.error(err.message);
       return null;
     }
   }
