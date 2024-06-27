@@ -214,16 +214,20 @@ export class BotCore implements IBotCore {
 
     logger.info(`[BotCore.callbackQuery] Incoming callback query from ${context.from.id}, with data <${data}>`);
 
-    const lambda = this._callbacks.find((lambda) => lambda.signature.test(data));
+    const callback = this._callbacks.find((lambda) => lambda.signature.test(data));
 
-    if (!lambda) {
-      context.telegram.deleteMessage(context.chat.id, context.msgId);
-      logger.error(`[BotCore.callbackQuery] Callback for <${data}> not found`);
-      return;
-    }
+    if (!callback) return;
+
+    logger.info(`[BotCore.callbackQuery] selected callback for query ${data} -> ${callback.name}`);
+
+    // if (!callback) {
+    //   context.telegram.deleteMessage(context.chat.id, context.msgId);
+    //   logger.error(`[BotCore.callbackQuery] Callback for <${data}> not found`);
+    //   return;
+    // }
 
     try {
-      await lambda.callback(context, this);
+      await callback.callback(context, this);
     } catch (err) {
       context.telegram.deleteMessage(context.chat.id, context.msgId);
       logger.error(`[BotCore.callbackQuery] Error while processing query <${data}>, reason:`);
