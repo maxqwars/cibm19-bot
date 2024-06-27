@@ -25,13 +25,13 @@ export class Cache {
     }
   }
 
-  async set(key: string, value: string, expires: number): Promise<Boolean | null> {
+  async set(key: string, value: string, expires: number): Promise<any | null> {
     try {
       this._log.info(`[cache] Set cache value for key <${key}>, expires after ${expires} seconds`);
       return new Promise((resolve, reject) => {
         this._client.set(key, value, { expires }, (err, success) => {
           if (err) reject(err);
-          resolve(success);
+          resolve(value);
         });
       });
     } catch (err) {

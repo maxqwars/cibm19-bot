@@ -31,12 +31,18 @@ export class Organizations {
   }
 
   async findById(id: number) {
-    const orgData = this._client.organization.findUnique({
-      where: {
-        id,
-      },
-    });
-    return orgData;
+    try {
+      const orgData = this._client.organization.findUnique({
+        where: {
+          id,
+        },
+      });
+      return orgData;
+    } catch (err) {
+      logger.error(`[Organizations.findById] Failed get organization by ID, reason ⬇️`)
+      logger.error(err.message)
+      return null;
+    }
   }
 
   async getAll() {

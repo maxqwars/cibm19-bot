@@ -12,6 +12,7 @@ type VolunteerCreateDataDto = {
 
 const VOLUNTEER_DATA_LIFETIME = 1000 * 60 * 60 * 3; // Total 3 hours
 const TG_ID_TO_VOLUNTEER_BIND_LIFETIME = 1000 * 60 * 60 * 12; // Total 12 hours
+const TG_ID_TO_SYS_ID_BIND_LIFETIME = 1000 * 60 * 60 * 12; // Total 12 hours
 
 export class Volunteers {
   private readonly _client: PrismaClient;
@@ -37,93 +38,70 @@ export class Volunteers {
     }
   }
 
-  private async _getVolunteerData(id: number) {
-    const serializedVolunteerData = await this._cache.get(`volunteer_data_${id}`);
+  private async _getVolunteerDataWithCache(id: number) {
 
-    if (serializedVolunteerData) {
-      return JSON.parse(serializedVolunteerData.toString());
+    if (id === 0) return null
+
+    const cache = await this._cache.get(`volunteer_data_${id}`);
+
+    if (cache === null || cache.toString().length === 0) {
+      logger.info(`[Volonteers._getVolunteerDataWithCache] Cache for volonteer ${id} not found, generate cache...`);
+      const volunteerData = await this._client.volunteer.findFirst({ where: { id } });
+
+      if (!volunteerData) return null
+
+      const createdCache = await this._cache.set(
+        `volunteer_data_${id}`,
+        JSON.stringify({ ...volunteerData, telegramId: Number(volunteerData.telegramId) }),
+        VOLUNTEER_DATA_LIFETIME,
+      );
+      logger.info(`[Volonteers._getVolunteerDataWithCache] Cache for volonteer ${id} created, result ${createdCache}`);
+      return volunteerData;
     }
 
-    const volunteerData = await this._client.volunteer.findFirst({
-      where: {
-        id,
-      },
-    });
+    const volunteerData = JSON.parse(cache.toString());
+    return volunteerData as Volunteer;
+  }
 
-    const cacheValue = {
-      id: volunteerData.id,
-      fio: volunteerData.fio,
-      role: volunteerData.role,
-      telegramId: Number(volunteerData.telegramId),
-      telegramUsername: volunteerData.telegramUsername,
-      telegramName: volunteerData.telegramName,
-      balance: volunteerData.balance,
-      isAdult: volunteerData.isAdult,
-      createdAt: volunteerData.createdAt,
-      updatedAt: volunteerData.updatedtAt,
-      organizationId: volunteerData.organizationId,
-    };
+  private async _findVolunteerSystemIdUsingTelegramId(telegramId: number) {
+    const cache = await this._cache.get(`system_to_telegram_id=${telegramId}`);
 
-    await this._cache.set(`volunteer_data_${Number(id)}`, JSON.stringify(cacheValue), VOLUNTEER_DATA_LIFETIME);
-    return volunteerData;
+    if (cache === null || cache.toString().length === 0) {
+      logger.info(
+        `[Volonteers._findVolunteerSystemIdUsingTelegramId] Cache for volonteer ${telegramId} not found, generate cache...`,
+      );
+      const volunteerData = await this._client.volunteer.findUnique({
+        where: { telegramId },
+        select: {
+          id: true,
+        },
+      });
+
+      if (!volunteerData) return 0;
+
+      const createdCache = await this._cache.set(
+        `system_to_telegram_id=${volunteerData.id}`,
+        String(volunteerData.id),
+        TG_ID_TO_SYS_ID_BIND_LIFETIME,
+      );
+      logger.info(
+        `[Volonteers._findVolunteerSystemIdUsingTelegramId] Cache for volonteer ${telegramId} created, result ${createdCache}`,
+      );
+      return Number(createdCache);
+    }
+
+    return Number(cache);
   }
 
   async findVolunteerUnderTelegramId(telegramId: number) {
-    const volunteerSystemId = await this._cache.get(`volunteer_system_id_${telegramId}`);
-
-    if (volunteerSystemId) {
-      logger.info(`[Volunteers.findVolunteerUnderTelegramId] restore data from cache...`);
-      const serializedVolunteerData = await this._cache.get(`volunteer_data_${volunteerSystemId}`);
-
-      if (serializedVolunteerData) {
-        return JSON.parse(serializedVolunteerData.toString()) as Volunteer;
-      }
-
-      try {
-        const volunteerData = await this._client.volunteer.findUnique({
-          where: { telegramId },
-        });
-
-        if (!volunteerData) return null;
-
-        await this._cache.set(
-          `volunteer_system_id_${telegramId}`,
-          String(volunteerData.id),
-          TG_ID_TO_VOLUNTEER_BIND_LIFETIME,
-        );
-
-        return volunteerData;
-      } catch (err) {
-        logger.error(`[Volunteers.findVolunteerUnderTelegramId] failed get volunteer data, reason:`);
-        logger.error(err.message);
-        return null;
-      }
-    }
-
-    try {
-      const volunteerData = await this._client.volunteer.findUnique({
-        where: { telegramId },
-      });
-
-      if (!volunteerData) return null;
-
-      await this._cache.set(
-        `volunteer_system_id_${telegramId}`,
-        String(volunteerData.id),
-        TG_ID_TO_VOLUNTEER_BIND_LIFETIME,
-      );
-
-      return volunteerData;
-    } catch (err) {
-      logger.error(`[Volunteers.findVolunteerUnderTelegramId] failed get volunteer data, reason:`);
-      logger.error(err.message);
-      return null;
-    }
+    const volonteerSystemId = await this._findVolunteerSystemIdUsingTelegramId(telegramId);
+    const volunteerData = await this._getVolunteerDataWithCache(volonteerSystemId);
+    return volunteerData;
   }
 
   async findVolunteerUnderId(id: number) {
     try {
-      return await this._getVolunteerData(id);
+      return await this._getVolunteerDataWithCache(id);
     } catch (err) {
       logger.error(`Failed find volunteer (under ID) record, reason:`);
       logger.error(err.message);
@@ -186,7 +164,7 @@ export class Volunteers {
       return JSON.parse(serializedVolunteerData.toString());
     }
 
-    const volunteerData = await this._getVolunteerData(id);
+    const volunteerData = await this._getVolunteerDataWithCache(id);
     return volunteerData;
   }
 
@@ -210,7 +188,7 @@ export class Volunteers {
       return organizationId;
     }
 
-    const { organizationId } = await this._getVolunteerData(id);
+    const { organizationId } = await this._getVolunteerDataWithCache(id);
     return organizationId;
   }
 
