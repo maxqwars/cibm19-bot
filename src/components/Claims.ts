@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import logger from "../logger";
+import { Logger } from "simple-node-logger";
 
 type ClaimCreateDataDto = {
   volunteerId: number;
@@ -8,9 +8,11 @@ type ClaimCreateDataDto = {
 
 export class Claims {
   private readonly _client: PrismaClient;
+  private readonly _logger: Logger;
 
-  constructor(prisma: PrismaClient) {
+  constructor(prisma: PrismaClient, logger: Logger) {
     this._client = prisma;
+    this._logger = logger;
   }
 
   async create(dto: ClaimCreateDataDto) {

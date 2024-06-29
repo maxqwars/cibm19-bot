@@ -4,7 +4,7 @@ import { Render } from "../components/Render";
 import { Volunteers } from "../components/Volunteers";
 import { Scriptor } from "../helpers/Scriptor";
 import { Reports } from "../components/Reports";
-import logger from "../logger";
+// import logger from "../logger";
 
 export const teamCommand = new Scriptor({
   name: "team-command",
@@ -57,7 +57,7 @@ export const teamCommand = new Scriptor({
         const all = (await reports.getVolunteerAllReportsCount(member.id)) || 0;
         const confirm = (await reports.getVolunteerConfirmedReportsCount(member.id)) || 0;
 
-        logger.info(`${member.telegramName} ${confirm} ${all}`);
+        // logger.info(`${member.telegramName} ${confirm} ${all}`);
 
         const percent = (confirm / all) * 100;
 

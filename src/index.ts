@@ -7,7 +7,7 @@ import { config } from "dotenv";
 import { $Enums, PrismaClient } from "@prisma/client";
 import memjs from "memjs";
 import { BotCore } from "./modules/BotCore";
-import logger from "./logger";
+import { createLogger } from "./logger";
 import { Telegraf } from "telegraf";
 
 // Import Query callbacks
@@ -59,13 +59,14 @@ const MEMCACHED_HOSTS = env["MEMCACHED_HOSTS"];
 // Init external modules
 const prisma = new PrismaClient();
 const memClient = memjs.Client.create(MEMCACHED_HOSTS, {});
+const logger = createLogger(MODE as "development" | "production");
 
 // Init components
-const cache = new Cache(memClient);
-const render = new Render(join(cwd(), "./src/views"), cache);
-const volunteers = new Volunteers(prisma, cache);
-const organizations = new Organizations(prisma, cache);
-const claims = new Claims(prisma);
+const cache = new Cache(memClient, logger);
+const render = new Render(join(cwd(), "./src/views"), cache, logger);
+const volunteers = new Volunteers(prisma, cache, logger);
+const organizations = new Organizations(prisma, cache, logger);
+const claims = new Claims(prisma, logger);
 const reports = new Reports(prisma);
 
 /*
@@ -130,6 +131,7 @@ const COMPONENTS = [
 
 // Create blaze-bot
 const core = new BotCore(
+  logger,
   {
     scripts: SCRIPTS,
     callbacks: CALLBACKS,

@@ -1,6 +1,6 @@
 import { Organization, PrismaClient } from "@prisma/client";
-import logger from "../logger";
 import { Cache } from "./Cache";
+import { Logger } from "simple-node-logger";
 
 type OrganizationCreateDataDto = {
   name: string;
@@ -12,10 +12,12 @@ const ORG_CACHE_LIFETIME = 1000 * 60 * 60 * 5;
 export class Organizations {
   private readonly _client: PrismaClient;
   private readonly _cache: Cache;
+  private readonly _logger: Logger;
 
-  constructor(prisma: PrismaClient, cache: Cache) {
+  constructor(prisma: PrismaClient, cache: Cache, logger: Logger) {
     this._client = prisma;
     this._cache = cache;
+    this._logger = logger
   }
 
   async create(dto: OrganizationCreateDataDto) {
@@ -24,8 +26,8 @@ export class Organizations {
         data: dto,
       });
     } catch (err) {
-      logger.error(`Failed create organization "${dto.name}", reason:`);
-      logger.error(err.message);
+      this._logger.error(`Failed create organization "${dto.name}", reason:`);
+      this._logger.error(err.message);
       return;
     }
   }
@@ -39,8 +41,8 @@ export class Organizations {
       });
       return orgData;
     } catch (err) {
-      logger.error(`[Organizations.findById] Failed get organization by ID, reason ⬇️`);
-      logger.error(err.message);
+      this._logger.error(`[Organizations.findById] Failed get organization by ID, reason ⬇️`);
+      this._logger.error(err.message);
       return null;
     }
   }

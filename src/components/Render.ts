@@ -1,7 +1,7 @@
 import { readdirSync, readFile } from "node:fs";
 import { join } from "node:path";
 import { Cache } from "./Cache";
-import logger from "../logger";
+import { Logger } from "simple-node-logger";
 
 type TemplatePayloadData = {
   [key: string]: string | number | boolean;
@@ -11,11 +11,13 @@ export class Render {
   private _templates: string[];
   private readonly _cache: Cache;
   private readonly _viewsDirPath: string;
+  private readonly _logger: Logger;
 
-  constructor(viewsDir: string, cache: Cache) {
+  constructor(viewsDir: string, cache: Cache, logger: Logger) {
     this._viewsDirPath = viewsDir;
     this._templates = this._searchTempsInViews(viewsDir);
     this._cache = cache;
+    this._logger = logger
   }
 
   private _searchTempsInViews(viewsDir: string) {
@@ -58,12 +60,12 @@ export class Render {
     let buff = content;
 
     if (!content) {
-      logger.info(`Templates:\n${this._templates.map((temp) => `${temp}\n`)}`);
+      this._logger.info(`Templates:\n${this._templates.map((temp) => `${temp}\n`)}`);
       return null;
     }
 
     if (Object.keys(data).length === 0) {
-      logger.info(`Render result for ${temp}: ${buff}`);
+      this._logger.info(`Render result for ${temp}: ${buff}`);
       return content;
     }
 
@@ -73,7 +75,7 @@ export class Render {
       buff = buff.replace(searchValue, String(data[key]));
     }
 
-    logger.info(`Render result for ${temp}: ${buff}`);
+    this._logger.info(`Render result for ${temp}: ${buff}`);
 
     return buff;
   }

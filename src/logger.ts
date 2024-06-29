@@ -1,6 +1,7 @@
-// import pino from "pino";
-// export default pino({});
-
 import { createSimpleLogger } from "simple-node-logger";
 
-export default createSimpleLogger();
+export function createLogger(mode: "development" | "production" = "production") {
+  // return createSimpleLogger({ level: mode === "development" ? "debug" : "info" });
+  return createSimpleLogger ()
+}
+      

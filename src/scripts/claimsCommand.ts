@@ -5,7 +5,6 @@ import { Scriptor } from "../helpers/Scriptor";
 import { Render } from "../components/Render";
 import { Markup } from "telegraf";
 import { Organizations } from "../components/Organizations";
-import logger from "../logger";
 
 const claimsCommandConstruct = new Scriptor({
   name: "claims-command",
@@ -81,9 +80,9 @@ claimsCommandConstruct.addStage(async (context, core) => {
   const volunteers = core.getModule("volunteers") as Volunteers;
   const organizations = core.getModule("organizations") as Organizations;
 
-  for (const method in claims) {
-    logger.info(method);
-  }
+  // for (const method in claims) {
+  //   logger.info(method);
+  // }
 
   const organizationId = Number(context.text.trim());
   const claimsArr = await claims.organizationClaims(organizationId);

@@ -6,7 +6,6 @@ import { IBotCore } from "../modules/BotCore";
 import { Context } from "telegraf";
 import { $Enums } from "@prisma/client";
 import { Render } from "../components/Render";
-import logger from "../logger";
 
 export const claimCallback = new Impact({
   name: "claim_query_callback",
@@ -18,6 +17,7 @@ export const claimCallback = new Impact({
     const render = core.getModule("render") as Render;
 
     const [action, claimId] = context.callbackQuery["data"].split("=");
+
     const {
       chat: { id: chatId },
       callbackQuery: {
@@ -27,7 +27,6 @@ export const claimCallback = new Impact({
     } = context;
 
     const { id, volunteerId, organizationId } = await claims.claimDetails(Number(claimId));
-
     const initiatorData = await volunteers.findVolunteerUnderId(volunteerId);
 
     if (action === "reject") {

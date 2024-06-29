@@ -2,7 +2,7 @@ import { Context, Telegraf } from "telegraf";
 import { IScriptor } from "../helpers/Scriptor";
 import { IImpact } from "../helpers/Impact";
 import { CallbackQuery, Update } from "telegraf/typings/core/types/typegram";
-import logger from "../logger";
+import { Logger } from "simple-node-logger";
 
 type CoreComponentsType = {
   name: string;
@@ -29,7 +29,7 @@ type SessionItem = {
 };
 
 interface IBotCoreConstructable {
-  new (options: CoreOptionsType, components: CoreComponentsType): IBotCore;
+  new (logger: Logger, options: CoreOptionsType, components: CoreComponentsType): IBotCore;
 }
 
 export interface IBotCore {
@@ -52,6 +52,7 @@ export interface IBotCore {
   init(bot: Telegraf<Context<Update>>): IBotCore;
   setSession(telegramId: number, session: SessionItem): SessionItem;
   components: { [key: string]: any };
+  logger: Logger
 }
 
 export class BotCore implements IBotCore {
@@ -61,10 +62,12 @@ export class BotCore implements IBotCore {
   private readonly _sessions: { [key: number]: SessionItem };
   private readonly _availableCom: string[] = [];
 
+  private readonly _logger: Logger;
+
   private _components: { [key: string]: any };
   private _flowKeyToScriptMap: { [key: string]: IScriptor };
 
-  constructor(options: CoreOptionsType, components: CoreComponentsType[]) {
+  constructor(logger: Logger, options: CoreOptionsType, components: CoreComponentsType[]) {
     this._scripts = options.scripts;
     this._preDefinedAdmins = options.preDefinedAdmins;
     this._flowKeyToScriptMap = {};
@@ -72,17 +75,22 @@ export class BotCore implements IBotCore {
     this._components = {};
     this._callbacks = options.callbacks;
 
+    this._logger = logger;
+
     for (const cmp in components) {
       const { name, component } = components[cmp];
-
-      logger.info(`[BotCore] Registered component <${name}>`);
+      this._logger.debug(`[BotCore.constructor] Added component ${name}`);
       this.components[name] = component;
     }
   }
 
+  get logger() {
+    return this._logger
+  }
+
   setSession(telegramId: number, session: SessionItem): SessionItem {
-    logger.info(
-      `[BotCore] Update session variables for <${telegramId}> stage: <${session.stage}> lastMessage: <${session.lastMessage}>`,
+    this._logger.debug(
+      `[BotCore.setSession] Update session variables for ID ${telegramId} stage change to "${session.stage}" last message change to "${session.lastMessage}"`,
     );
     this._sessions[telegramId] = session;
     return session;
@@ -113,7 +121,7 @@ export class BotCore implements IBotCore {
     bot.use((context: Context, next) => {
       middleware(context, this)
         .then(() => next())
-        .catch((err) => logger.error(err.message));
+        .catch((err) => this._logger.error(err.message));
     });
 
     return this;
@@ -147,7 +155,7 @@ export class BotCore implements IBotCore {
     for (const script of this._scripts) {
       const { command, cb } = script.entryPoint;
 
-      logger.info(`[BotCore.bindScriptsCommands] Bind command /${command} for script ${script.name}`);
+      this._logger.debug(`[BotCore.bindScriptsCommands] Bind command /${command} for script ${script.name}`);
 
       bot.command(command, async (context: Context) => {
         await cb(context, this);
@@ -159,15 +167,15 @@ export class BotCore implements IBotCore {
 
       this._availableCom.push(command);
 
-      logger.info(
+      this._logger.debug(
         `[BotCore.bindScriptsCommands] Complete bind point for ${script.name}, points list: [${script.stages.join(",")}]`,
       );
     }
 
-    logger.info(`[BotCore.bindScriptsCommands] List of available commands:`);
     for (const cmd of this._availableCom) {
-      logger.info(`[BotCore.bindScriptsCommands] Top-level command "${cmd}"`);
+      this._logger.info(`[BotCore.bindScriptsCommands] Register command "/${cmd}"`);
     }
+
     return this;
   }
 
@@ -198,11 +206,11 @@ export class BotCore implements IBotCore {
     }
 
     try {
-      logger.info(`[BotCore.rawMessage] Executing script for stage: ${stage}...`);
+      this._logger.debug(`[BotCore.rawMessage] Executing script for stage: ${stage}...`);
       await script.execute(context, this);
     } catch (err) {
-      logger.error(`[BotCore.rawMessage] Error while execution stage '${stage}' script, reason:`);
-      logger.error(err.message);
+      this._logger.error(`[BotCore.rawMessage] Error while execution stage '${stage}' script, reason:`);
+      this._logger.error(err.message);
       this.flushStage(fromId);
       await onErr(context, this);
       return;
@@ -212,13 +220,13 @@ export class BotCore implements IBotCore {
   async callbackQuery(context: Context<Update.CallbackQueryUpdate>): Promise<void> {
     const { data } = context.update.callback_query as CallbackQuery.DataQuery;
 
-    logger.info(`[BotCore.callbackQuery] Incoming callback query from ${context.from.id}, with data <${data}>`);
+    this._logger.debug(`[BotCore.callbackQuery] Incoming callback query from ${context.from.id}, with data <${data}>`);
 
     const callback = this._callbacks.find((lambda) => lambda.signature.test(data));
 
     if (!callback) return;
 
-    logger.info(`[BotCore.callbackQuery] selected callback for query ${data} -> ${callback.name}`);
+    this._logger.debug(`[BotCore.callbackQuery] selected callback for query ${data} -> ${callback.name}`);
 
     // if (!callback) {
     //   context.telegram.deleteMessage(context.chat.id, context.msgId);
@@ -230,8 +238,8 @@ export class BotCore implements IBotCore {
       await callback.callback(context, this);
     } catch (err) {
       context.telegram.deleteMessage(context.chat.id, context.msgId);
-      logger.error(`[BotCore.callbackQuery] Error while processing query <${data}>, reason:`);
-      logger.error(err.message);
+      this._logger.error(`[BotCore.callbackQuery] Error while processing query <${data}>, reason:`);
+      this._logger.error(err.message);
       return;
     }
 
@@ -242,11 +250,11 @@ export class BotCore implements IBotCore {
     for (const script of this._scripts) {
       for (const stage of script.stages) {
         this._flowKeyToScriptMap[stage] = script;
-
-        logger.info(`[BotCore.generateStageToScriptorMap] Add stage ${stage}->${script.name}`);
+        this._logger.debug(
+          `[BotCore.generateStageToScriptorMap] Register association stage "${stage}" to script "${script.name}"`,
+        );
       }
-
-      logger.info(`[BotCore.generateStageToScriptorMap] Complete load stages for ${script.name}`);
+      this._logger.debug(`[BotCore.generateStageToScriptorMap] Complete registration script "${script.name}"`);
     }
 
     return this;

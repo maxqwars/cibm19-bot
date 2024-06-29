@@ -27,7 +27,7 @@ Source code of Telegram bot for organizing the work of volunteers and volunteers
 | 🟢      | /register     | Command to register a user as a volunteer                                                                                                                           |
 | 🟡      | /claims       | Command for curators and administrators output a list of claims to join the organization                                                                            |
 | 🟢      | /privacy      | Display the text of the privacy policy                                                                                                                              |
-| 🟡      | /reports      | Admin command displaying a list of all unprocessed content links                                                                                                    |
+| 🟢      | /reports      | Admin command displaying a list of all unprocessed content links                                                                                                    |
 | 🟢      | /start        | Display general information about the bot, welcome message                                                                                                          |
 | 🔴      | /leaderboard  | Table of leaders among organizations                                                                                                                                |
 | 🔴      | /lockdown     | Admin and curatorial command to enable / disable registration in the organization                                                                                   |

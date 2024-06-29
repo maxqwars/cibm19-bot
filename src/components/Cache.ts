@@ -1,12 +1,13 @@
 import { Client } from "memjs";
-import logger from "../logger";
+import { Logger } from "simple-node-logger";
 
 export class Cache {
   private readonly _client: Client;
-  private readonly _log = logger;
+  private readonly _log: Logger;
 
-  constructor(client: Client) {
+  constructor(client: Client, logger: Logger) {
     this._client = client;
+    this._log = logger
   }
 
   async get(key: string): Promise<Buffer | null> {

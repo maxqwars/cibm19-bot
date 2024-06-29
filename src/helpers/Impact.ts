@@ -1,7 +1,6 @@
 import { Context } from "telegraf";
 import { IBotCore } from "../modules/BotCore";
 import { Update } from "telegraf/typings/core/types/typegram";
-import logger from "../logger";
 
 const MOD_NAME = "[Impact]";
 

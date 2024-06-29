@@ -154,7 +154,7 @@ export class Reports {
     });
   }
 
-  async findSendedVolunteers(hash: string) {
+  async findWitnessesVolunteers(hash: string) {
     return await this._client.report.findMany({
       where: {
         hash,

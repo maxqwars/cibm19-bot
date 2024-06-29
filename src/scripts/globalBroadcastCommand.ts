@@ -2,7 +2,6 @@ import { $Enums, ROLE } from "@prisma/client";
 import { Render } from "../components/Render";
 import { Volunteers } from "../components/Volunteers";
 import { Scriptor } from "../helpers/Scriptor";
-import logger from "../logger";
 
 const PER_ITERATION_COUNT = 100;
 
@@ -48,8 +47,8 @@ globalBroadcast.addStage(async (context, core) => {
   let pages = volunteersCount / PER_ITERATION_COUNT;
   pages = volunteersCount % PER_ITERATION_COUNT === 0 ? 0 : 1;
 
-  logger.info(`[globalBroadcastCommand] Volunteers count -> ${volunteersCount}`);
-  logger.info(`[globalBroadcastCommand] Pages count -> ${pages}`);
+  // logger.info(`[globalBroadcastCommand] Volunteers count -> ${volunteersCount}`);
+  // logger.info(`[globalBroadcastCommand] Pages count -> ${pages}`);
 
   while (index <= pages) {
     const volunteersData = await volunteers.paginatedRead(PER_ITERATION_COUNT, skip);
@@ -63,8 +62,8 @@ globalBroadcast.addStage(async (context, core) => {
     index = index + 1;
     skip = skip + PER_ITERATION_COUNT;
 
-    logger.info(`[globalBroadcastCommand] index val -> ${index}`);
-    logger.info(`[globalBroadcastCommand] skip val -> ${skip}`);
+    // logger.info(`[globalBroadcastCommand] index val -> ${index}`);
+    // logger.info(`[globalBroadcastCommand] skip val -> ${skip}`);
   }
 
   return true;

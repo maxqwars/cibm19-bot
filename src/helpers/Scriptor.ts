@@ -1,7 +1,7 @@
 import { Context } from "telegraf";
 import { IBotCore } from "../modules/BotCore";
 import { Update } from "telegraf/typings/core/types/typegram";
-import logger from "../logger";
+// import logger from "../logger";
 
 type EntryPointType = {
   command: string;
@@ -69,7 +69,7 @@ export class Scriptor implements IScriptor {
     const stageIndex = Number(stage.split("_")[stage.split("_").length - 1]);
     const isLastStage = stageIndex >= this._stages.length;
 
-    logger.info(`[Scriptor] Processing script: ${this.name}, stage: ${stage}`);
+    // logger.info(`[Scriptor] Processing script: ${this.name}, stage: ${stage}`);
 
     try {
       const operationSuccess = await handler(context, core);
@@ -79,20 +79,20 @@ export class Scriptor implements IScriptor {
       }
 
       if (isLastStage) {
-        logger.info(`[Scriptor] Script ${this.name} is end, flush session...`);
+        // logger.info(`[Scriptor] Script ${this.name} is end, flush session...`);
         core.flushStage(context.from.id);
         return;
       }
 
-      logger.info(`[Scriptor] Set next stage for script ${this.name}: ${stage}->${this._name}_${stageIndex + 1}`);
+      // logger.info(`[Scriptor] Set next stage for script ${this.name}: ${stage}->${this._name}_${stageIndex + 1}`);
 
       core.setSession(context.from.id, {
         stage: `${this._name}_${stageIndex + 1}`,
         lastMessage: context.text,
       });
     } catch (err) {
-      logger.error(`Error while processing script "${this.name}" on stage "${stage}", reason:`);
-      logger.error(err.message);
+      // logger.error(`Error while processing script "${this.name}" on stage "${stage}", reason:`);
+      // logger.error(err.message);
       return;
     }
   }
@@ -104,7 +104,7 @@ export class Scriptor implements IScriptor {
       handler,
     };
 
-    logger.info(`[Scriptor] Added new stage ${stage} to script ${this.name}`);
+    // logger.info(`[Scriptor] Added new stage ${stage} to script ${this.name}`);
     this._stages.push(stage);
     return this;
   }

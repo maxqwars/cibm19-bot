@@ -1,6 +1,6 @@
 import { $Enums, PrismaClient, Volunteer } from "@prisma/client";
 import { Cache } from "./Cache";
-import logger from "../logger";
+import { Logger } from "simple-node-logger";
 
 type VolunteerCreateDataDto = {
   fio: string;
@@ -16,10 +16,12 @@ const TG_ID_TO_SYS_ID_BIND_LIFETIME = 1000 * 60 * 60 * 12; // Total 12 hours
 export class Volunteers {
   private readonly _client: PrismaClient;
   private readonly _cache: Cache;
+  private readonly _logger: Logger;
 
-  constructor(prisma: PrismaClient, cache: Cache) {
+  constructor(prisma: PrismaClient, cache: Cache, logger: Logger) {
     this._client = prisma;
     this._cache = cache;
+    this._logger = logger;
   }
 
   async createWithData(dto: VolunteerCreateDataDto) {
@@ -31,8 +33,8 @@ export class Volunteers {
         },
       });
     } catch (err) {
-      logger.error(`Failed create new volunteer record, reason:`);
-      logger.error(err.message);
+      this._logger.error(`Failed create new volunteer record, reason:`);
+      this._logger.error(err.message);
       return;
     }
   }
@@ -43,7 +45,9 @@ export class Volunteers {
     const cache = await this._cache.get(`volunteer_data_${id}`);
 
     if (cache === null || cache.toString().length === 0) {
-      logger.info(`[Volonteers._getVolunteerDataWithCache] Cache for volonteer ${id} not found, generate cache...`);
+      this._logger.info(
+        `[Volonteers._getVolunteerDataWithCache] Cache for volonteer ${id} not found, generate cache...`,
+      );
       const volunteerData = await this._client.volunteer.findFirst({ where: { id } });
 
       if (!volunteerData) return null;
@@ -53,7 +57,9 @@ export class Volunteers {
         JSON.stringify({ ...volunteerData, telegramId: Number(volunteerData.telegramId) }),
         VOLUNTEER_DATA_LIFETIME,
       );
-      logger.info(`[Volonteers._getVolunteerDataWithCache] Cache for volonteer ${id} created, result ${createdCache}`);
+      this._logger.info(
+        `[Volonteers._getVolunteerDataWithCache] Cache for volonteer ${id} created, result ${createdCache}`,
+      );
       return volunteerData;
     }
 
@@ -65,7 +71,7 @@ export class Volunteers {
     const cache = await this._cache.get(`system_to_telegram_id=${telegramId}`);
 
     if (cache === null || cache.toString().length === 0) {
-      logger.info(
+      this._logger.info(
         `[Volonteers._findVolunteerSystemIdUsingTelegramId] Cache for volonteer ${telegramId} not found, generate cache...`,
       );
       const volunteerData = await this._client.volunteer.findUnique({
@@ -82,7 +88,7 @@ export class Volunteers {
         String(volunteerData.id),
         TG_ID_TO_SYS_ID_BIND_LIFETIME,
       );
-      logger.info(
+      this._logger.info(
         `[Volonteers._findVolunteerSystemIdUsingTelegramId] Cache for volonteer ${telegramId} created, result ${createdCache}`,
       );
       return Number(createdCache);
@@ -101,10 +107,24 @@ export class Volunteers {
     try {
       return await this._getVolunteerDataWithCache(id);
     } catch (err) {
-      logger.error(`Failed find volunteer (under ID) record, reason:`);
-      logger.error(err.message);
+      this._logger.error(`Failed find volunteer (under ID) record, reason:`);
+      this._logger.error(err.message);
       return;
     }
+  }
+
+  async updateBalance(id: number, balance: number) {
+    const updated = await this._client.volunteer.update({
+      where: {
+        id
+      },
+      data: {
+        balance
+      }
+    })
+
+    await this._cache.clean(`volunteer_data_${id}`);
+    return updated
   }
 
   async updateVolunteerFio(id: number, fio: string) {
@@ -119,8 +139,8 @@ export class Volunteers {
         },
       });
     } catch (err) {
-      logger.error(`Failed update volunteer [${id}] fio  field, reason:`);
-      logger.error(err.message);
+      this._logger.error(`Failed update volunteer [${id}] fio  field, reason:`);
+      this._logger.error(err.message);
       return;
     }
   }
@@ -137,8 +157,8 @@ export class Volunteers {
         },
       });
     } catch (err) {
-      logger.error(`Failed update volunteer [${id}] role field, reason:`);
-      logger.error(err.message);
+      this._logger.error(`Failed update volunteer [${id}] role field, reason:`);
+      this._logger.error(err.message);
       return;
     }
   }

@@ -3,7 +3,6 @@ import { Render } from "../components/Render";
 import { Reports } from "../components/Reports";
 import { Volunteers } from "../components/Volunteers";
 import { Impact } from "../helpers/Impact";
-import logger from "../logger";
 
 export const reportCallback = new Impact({
   name: "report_query_callback",
@@ -19,8 +18,6 @@ export const reportCallback = new Impact({
     const reports = core.getModule("reports") as Reports;
     const render = core.getModule("render") as Render;
 
-    logger.info(`[report_query_callback] Processing report_query_callback...`);
-
     const [action, hash] = context.callbackQuery["data"].split("=");
     const reportData = await reports.findFirstUsingHash(hash);
     let confirmed = false;
@@ -34,23 +31,32 @@ export const reportCallback = new Impact({
       text,
     } = context;
 
-    logger.info(`[report_query_callback] action->${action}, hash->${hash}`);
-
     async function reject(hash: string) {
-      const sendedArr = await reports.findSendedVolunteers(hash);
+      const witnesses = await reports.findWitnessesVolunteers(hash);
       const message = await render.render("rejected-report.txt", { link: reportData.payload });
 
-      for (const vol of sendedArr) {
-        const { volunteerId } = vol;
+      for (const volunteer of witnesses) {
+        const { volunteerId } = volunteer;
         const { telegramId } = await volunteers.findVolunteerUnderId(volunteerId);
-
         context.telegram.sendMessage(Number(telegramId), message);
       }
 
       await reports.rejectReportsWithHash(hash);
     }
 
-    async function confirm(hash: string, reward: number) {}
+    async function confirm(hash: string, reward: number) {
+      const witnesses = await reports.findWitnessesVolunteers(hash);
+      const message = await render.render("confirmed-report.txt", { link: reportData.payload, reward });
+
+      for (const volunteer of witnesses) {
+        const { volunteerId } = volunteer;
+        const { telegramId, balance, id } = await volunteers.findVolunteerUnderId(volunteerId);
+        await volunteers.updateBalance(id, balance + reward)
+        context.telegram.sendMessage(Number(telegramId), message);
+      }
+
+      await reports.confirmReportsWithHash(hash);
+    }
 
     switch (action) {
       case "confirm_report_small": {

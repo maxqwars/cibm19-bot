@@ -3,7 +3,7 @@ import { Claims } from "../components/Claims";
 import { Render } from "../components/Render";
 import { Volunteers } from "../components/Volunteers";
 import { Scriptor } from "../helpers/Scriptor";
-import logger from "../logger";
+// import logger from "../logger";
 import { Organizations } from "../components/Organizations";
 
 const registerVolunteer = new Scriptor({
@@ -78,7 +78,7 @@ registerVolunteer.addStage(async (context, core) => {
   const volunteer = await volunteers.findVolunteerUnderTelegramId(context.from.id);
   const isAdult = getAge(birthday) >= 18;
 
-  logger.info(`isAdult: ${isAdult}`);
+  // logger.info(`isAdult: ${isAdult}`);
 
   const updatedVolunteer = await volunteers.updateVolunteerAdultStatus(volunteer.id, isAdult);
 
