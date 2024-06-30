@@ -17,7 +17,7 @@ export class Render {
     this._viewsDirPath = viewsDir;
     this._templates = this._searchTempsInViews(viewsDir);
     this._cache = cache;
-    this._logger = logger
+    this._logger = logger;
   }
 
   private _searchTempsInViews(viewsDir: string) {

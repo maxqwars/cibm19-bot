@@ -5,6 +5,14 @@ import { Volunteers } from "../components/Volunteers";
 import { $Enums } from "@prisma/client";
 import { Markup } from "telegraf";
 
+async function wait(ms: number) {
+  const promise = new Promise((resolve) => {
+    setInterval(() => resolve(true), ms);
+  });
+
+  await promise;
+}
+
 export const reportsCommand = new Scriptor({
   name: "today-reports-cmd",
   entryPoint: {
@@ -55,6 +63,8 @@ export const reportsCommand = new Scriptor({
           replyMessage,
           Markup.inlineKeyboard([...REWARD_BUTTONS, Markup.button.callback("❌", `reject_report=${report.hash}`)]),
         );
+
+        await wait(1500);
       }
 
       return true;

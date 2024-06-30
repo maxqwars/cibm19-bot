@@ -7,7 +7,7 @@ export class Cache {
 
   constructor(client: Client, logger: Logger) {
     this._client = client;
-    this._log = logger
+    this._log = logger;
   }
 
   async get(key: string): Promise<Buffer | null> {

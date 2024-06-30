@@ -52,8 +52,10 @@ export interface IBotCore {
   init(bot: Telegraf<Context<Update>>): IBotCore;
   setSession(telegramId: number, session: SessionItem): SessionItem;
   components: { [key: string]: any };
-  logger: Logger
+  logger: Logger;
 }
+
+const CALLBACK_QUERY_RETRIES_COUNT = 10;
 
 export class BotCore implements IBotCore {
   private readonly _scripts: IScriptor[];
@@ -85,7 +87,7 @@ export class BotCore implements IBotCore {
   }
 
   get logger() {
-    return this._logger
+    return this._logger;
   }
 
   setSession(telegramId: number, session: SessionItem): SessionItem {
@@ -219,31 +221,28 @@ export class BotCore implements IBotCore {
 
   async callbackQuery(context: Context<Update.CallbackQueryUpdate>): Promise<void> {
     const { data } = context.update.callback_query as CallbackQuery.DataQuery;
+    this._logger.info(`[BotCore.callbackQuery] Incoming callback query from ${context.from.id}, with data <${data}>`);
+    let retriesCount = 0;
 
-    this._logger.debug(`[BotCore.callbackQuery] Incoming callback query from ${context.from.id}, with data <${data}>`);
+    do {
+      const callback = this._callbacks.find((lambda) => lambda.signature.test(data));
 
-    const callback = this._callbacks.find((lambda) => lambda.signature.test(data));
+      if (!callback) {
+        retriesCount++;
+        continue;
+      }
 
-    if (!callback) return;
-
-    this._logger.debug(`[BotCore.callbackQuery] selected callback for query ${data} -> ${callback.name}`);
-
-    // if (!callback) {
-    //   context.telegram.deleteMessage(context.chat.id, context.msgId);
-    //   logger.error(`[BotCore.callbackQuery] Callback for <${data}> not found`);
-    //   return;
-    // }
-
-    try {
-      await callback.callback(context, this);
-    } catch (err) {
-      context.telegram.deleteMessage(context.chat.id, context.msgId);
-      this._logger.error(`[BotCore.callbackQuery] Error while processing query <${data}>, reason:`);
-      this._logger.error(err.message);
-      return;
-    }
-
-    return;
+      try {
+        await callback.callback(context, this);
+        retriesCount = CALLBACK_QUERY_RETRIES_COUNT;
+      } catch (err) {
+        context.telegram.deleteMessage(context.chat.id, context.msgId);
+        this._logger.error(`[BotCore.callbackQuery] Error while processing query <${data}>, reason:`);
+        this._logger.error(err.message);
+        retriesCount = CALLBACK_QUERY_RETRIES_COUNT;
+        return;
+      }
+    } while (retriesCount < CALLBACK_QUERY_RETRIES_COUNT);
   }
 
   generateStageToScriptorMap(): IBotCore {

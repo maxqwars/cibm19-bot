@@ -51,7 +51,7 @@ export const reportCallback = new Impact({
       for (const volunteer of witnesses) {
         const { volunteerId } = volunteer;
         const { telegramId, balance, id } = await volunteers.findVolunteerUnderId(volunteerId);
-        await volunteers.updateBalance(id, balance + reward)
+        await volunteers.updateBalance(id, balance + reward);
         context.telegram.sendMessage(Number(telegramId), message);
       }
 

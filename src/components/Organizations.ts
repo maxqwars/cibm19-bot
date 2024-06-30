@@ -17,7 +17,7 @@ export class Organizations {
   constructor(prisma: PrismaClient, cache: Cache, logger: Logger) {
     this._client = prisma;
     this._cache = cache;
-    this._logger = logger
+    this._logger = logger;
   }
 
   async create(dto: OrganizationCreateDataDto) {

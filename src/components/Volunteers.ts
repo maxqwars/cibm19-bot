@@ -116,15 +116,15 @@ export class Volunteers {
   async updateBalance(id: number, balance: number) {
     const updated = await this._client.volunteer.update({
       where: {
-        id
+        id,
       },
       data: {
-        balance
-      }
-    })
+        balance,
+      },
+    });
 
     await this._cache.clean(`volunteer_data_${id}`);
-    return updated
+    return updated;
   }
 
   async updateVolunteerFio(id: number, fio: string) {
