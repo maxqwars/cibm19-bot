@@ -13,6 +13,7 @@ import { Telegraf } from "telegraf";
 // Import Query callbacks
 import { claimCallback } from "./lambdas/claimCallback";
 import { reportCallback } from "./lambdas/reportCallback";
+import { lockdownCallback } from "./lambdas/lockdownCallback";
 
 // Import scripts
 import { helpCommand } from "./scripts/helpCommand";
@@ -97,7 +98,7 @@ const SCRIPTS = [
 /*
  * Define used callback`s
  */
-const CALLBACKS = [claimCallback, reportCallback];
+const CALLBACKS = [claimCallback, reportCallback, lockdownCallback];
 
 /*
  * Define used components (modules)

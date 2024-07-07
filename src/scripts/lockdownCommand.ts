@@ -32,11 +32,11 @@ const lockdownCmd = new Scriptor({
 
       const replyMsgText = await render.render("common-org-info.txt", {
         orgName: orgData.name,
-        lockdownIsTrue: orgData.closed ? "❌" : "✔️",
+        lockdownIsTrue: orgData.closed ? "🔒" : "🔓",
       });
 
-      const buttonLabel = orgData.closed ? "🔒" : "🔓";
-      const buttonValue = orgData.closed ? `enable_lockdown=${orgData.id}` : `disable_lockdown=${orgData.id}`;
+      const buttonLabel = orgData.closed ? "🔓" : "🔒";
+      const buttonValue = orgData.closed ? `disable_lockdown=${orgData.id}` : `enable_lockdown=${orgData.id}`;
       context.reply(replyMsgText, Markup.inlineKeyboard([Markup.button.callback(buttonLabel, buttonValue)]));
 
       return true;
@@ -55,18 +55,18 @@ lockdownCmd.addStage(async (context, core) => {
     context.reply(await render.render("no-access-to-operation.txt", {}));
     return true;
   }
-
+  
   const orgData = await organizations.findById(orgId);
+
   const replyMsgText = await render.render("common-org-info.txt", {
     orgName: orgData.name,
     lockdownIsTrue: orgData.closed ? "🔒" : "🔓",
   });
 
-  const buttonLabel = orgData.closed ? "🔓" : "🔒";
-  const buttonValue = orgData.closed ? `enable_lockdown=${orgData.id}` : `disable_lockdown=${orgData.id}`;
-
+  const buttonLabel = !orgData.closed ? "🔒" : "🔓";
+  const buttonValue = !orgData.closed ? `enable_lockdown=${orgData.id}` : `disable_lockdown=${orgData.id}`;
   context.reply(replyMsgText, Markup.inlineKeyboard([Markup.button.callback(buttonLabel, buttonValue)]));
-
+  
   return true;
 });
 
