@@ -1,0 +1,2 @@
+Организация: "{{orgName}}"
+Статус LOCKDOWN: {{lockdownIsTrue}}
