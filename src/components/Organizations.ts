@@ -79,4 +79,14 @@ export class Organizations {
       },
     });
   }
+
+  async updateLockdownStatus(id: number, closed: boolean) {
+    this._logger.debug(`[Organizations.updateLockdownStatus] Change lockdown ${closed} for ${id}...`);
+    return await this._client.organization.update({
+      where: { id },
+      data: {
+        closed,
+      },
+    });
+  }
 }
