@@ -60,22 +60,21 @@ export class Render {
     let buff = content;
 
     if (!content) {
-      this._logger.info(`Templates:\n${this._templates.map((temp) => `${temp}\n`)}`);
+      // this._logger.info(`Templates:\n${this._templates.map((temp) => `${temp}\n`)}`);
       return null;
     }
 
     if (Object.keys(data).length === 0) {
-      this._logger.info(`Render result for ${temp}: ${buff}`);
+      // this._logger.info(`Render result for ${temp}: ${buff}`);
       return content;
     }
 
     for (const key in data) {
-      console.log(buff);
       const searchValue = this._getRepExpression(key);
       buff = buff.replace(searchValue, String(data[key]));
     }
 
-    this._logger.info(`Render result for ${temp}: ${buff}`);
+    // this._logger.info(`Render result for ${temp}: ${buff}`);
 
     return buff;
   }
