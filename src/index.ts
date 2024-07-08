@@ -163,7 +163,7 @@ core
         await volunteers.createWithData({
           fio: "",
           telegramId: ctx.from.id,
-          telegramUsername: `${ctx.from.username}`,
+          telegramUsername: typeof ctx.from.username === "undefined" ? `id${ctx.from.id}` : ctx.from.username,
           telegramName: `${ctx.from.first_name} ${ctx.from.last_name}`,
           role: predefinedIds.find((id) => id === ctx.from.id) ? $Enums.ROLE.ADMIN : null,
         });

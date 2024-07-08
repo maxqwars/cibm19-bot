@@ -83,7 +83,7 @@ export const lockdownCallback = new Impact({
 
       return;
     }
-                                    
+
     return;
   },
 });

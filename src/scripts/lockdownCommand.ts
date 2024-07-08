@@ -55,7 +55,7 @@ lockdownCmd.addStage(async (context, core) => {
     context.reply(await render.render("no-access-to-operation.txt", {}));
     return true;
   }
-  
+
   const orgData = await organizations.findById(orgId);
 
   const replyMsgText = await render.render("common-org-info.txt", {
@@ -66,7 +66,7 @@ lockdownCmd.addStage(async (context, core) => {
   const buttonLabel = !orgData.closed ? "🔒" : "🔓";
   const buttonValue = !orgData.closed ? `enable_lockdown=${orgData.id}` : `disable_lockdown=${orgData.id}`;
   context.reply(replyMsgText, Markup.inlineKeyboard([Markup.button.callback(buttonLabel, buttonValue)]));
-  
+
   return true;
 });
 
