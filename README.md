@@ -9,7 +9,7 @@ Source code of Telegram bot for organizing the work of volunteers and volunteers
 | `DATABASE_URL`       | String                      | Database connection string for Prisma                                             |
 | `TELEGRAM_BOT_TOKEN` | String                      | Access key for your Telegram bot                                                  |
 | `PRE_DEFINED_ADMINS` | Array(Integer)              | Identifiers of Telegram accounts that will be granted administrator authorization |
-| `MODE`               | 'development', 'production' | Application mode, advanced logs are available in "development" mode               |
+| `NODE_ENV`               | 'development', 'production' | Application mode, advanced logs are available in "development" mode               |
 | `MEMCACHED_HOSTS`    | Array<String>               | List of memcached server hosts for caching                                        |
 | `SMALL_REWARD`       | Integer                     | The size of the small award                                                       |
 | `MEDIUM_REWARD`      | Integer                     | The size of the average award                                                     |
