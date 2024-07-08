@@ -17,7 +17,7 @@ import { lockdownCallback } from "./lambdas/lockdownCallback";
 
 // Import scripts
 import { helpCommand } from "./scripts/helpCommand";
-import createOrganizationScript from "./scripts/createOrganization";
+import { createOrganizationCommand } from "./scripts/createOrganization";
 import { viewOrganizationsCommand } from "./scripts/viewOrganizationsCommand";
 import { registerVolunteerScript as registerVolunteerScript } from "./scripts/registerVolunteerScript";
 import { claimsCommand } from "./scripts/claimsCommand";
@@ -54,13 +54,13 @@ config();
  */
 const TELEGRAM_BOT_TOKEN = env["TELEGRAM_BOT_TOKEN"];
 const PRE_DEFINED_ADMINS = env["PRE_DEFINED_ADMINS"];
-const MODE = env["MODE"] || "development";
+const NODE_ENV = env["NODE_ENV"] || "development";
 const MEMCACHED_HOSTS = env["MEMCACHED_HOSTS"];
 
 // Init external modules
 const prisma = new PrismaClient();
 const memClient = memjs.Client.create(MEMCACHED_HOSTS, {});
-const logger = createLogger(MODE as "development" | "production");
+const logger = createLogger(NODE_ENV as "development" | "production");
 
 // Init components
 const cache = new Cache(memClient, logger);
@@ -75,7 +75,7 @@ const reports = new Reports(prisma);
  */
 const SCRIPTS = [
   helpCommand,
-  createOrganizationScript,
+  createOrganizationCommand,
   viewOrganizationsCommand,
   registerVolunteerScript,
   claimsCommand,
@@ -228,4 +228,4 @@ async function runInDevelopment() {
 process.once("SIGINT", () => bot.stop("SIGINT"));
 process.once("SIGTERM", () => bot.stop("SIGTERM"));
 
-MODE === "production" ? runInDevelopment() : runInDevelopment();
+NODE_ENV === "production" ? runInDevelopment() : runInDevelopment();
