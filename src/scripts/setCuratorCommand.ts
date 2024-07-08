@@ -65,12 +65,12 @@ setCurator.addStage(async (context, core) => {
   if (candidateData.organizationId === selectedOrganizationId) {
     await volunteers.updateVolunteerRole(candidateData.id, $Enums.ROLE.CURATOR);
 
-    const notifyPayload = await render.render("", {
+    const notifyPayload = await render.render("you-now-curator.txt", {
       adminUsername: currentVolunteer.telegramUsername,
       organizationName: organizationData.name,
     });
 
-    context.telegram.sendMessage(candidateData.id, notifyPayload);
+    context.telegram.sendMessage(Number(candidateData.telegramId), notifyPayload);
 
     const replyPayload = await render.render("curator-seated.txt", {
       curatorUsername: candidateData.telegramUsername,
@@ -83,12 +83,12 @@ setCurator.addStage(async (context, core) => {
   await volunteers.addOrganization(candidateData.id, selectedOrganizationId);
   await volunteers.updateVolunteerRole(candidateData.id, $Enums.ROLE.CURATOR);
 
-  const notifyPayload = await render.render("", {
+  const notifyPayload = await render.render("you-now-curator              .txt", {
     adminUsername: currentVolunteer.telegramUsername,
     organizationName: organizationData.name,
   });
 
-  context.telegram.sendMessage(candidateData.id, notifyPayload);
+  context.telegram.sendMessage(Number(candidateData.telegramId), notifyPayload);
 
   const replyPayload = await render.render("curator-seated.txt", {
     curatorUsername: candidateData.telegramUsername,
