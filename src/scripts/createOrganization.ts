@@ -5,7 +5,7 @@ import { calcMd5 } from "../functions/calcMd5";
 import { Volunteers } from "../components/Volunteers";
 import { $Enums } from "@prisma/client";
 
-const createOrganizationScript = new Scriptor({
+const createOrganizationCmd = new Scriptor({
   name: "create-org",
   entryPoint: {
     command: "create_org",
@@ -28,7 +28,7 @@ const createOrganizationScript = new Scriptor({
   },
 });
 
-createOrganizationScript.addStage(async (context, core) => {
+createOrganizationCmd.addStage(async (context, core) => {
   const text = context.text;
   const organizations = core.getModule("organizations") as Organizations;
   const render = core.getModule("render") as Render;
@@ -62,4 +62,4 @@ createOrganizationScript.addStage(async (context, core) => {
   return true;
 });
 
-export default createOrganizationScript;
+export const createOrganizationCommand = createOrganizationCmd;
