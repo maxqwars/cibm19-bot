@@ -1,0 +1,20 @@
+🔰 Профиль волонтера
+
+⬇️ Общая информация ⬇️
+
+👤 Ф.И.О: {{fio}}
+👤 Указаное имя: {{displayName}}
+📧 Никнейм: @{{username}}
+🚀 Зарегистрирован(на): {{joinAt}}
+🎭 Роль: {{role}}
+⚡ Ранг: {{rank}}
+🏢 Организация: {{organization}}
+🪙 Баллы: {{balance}}
+
+📊 Статистика 📊
+
+🗂️ Всего отчётов: {{reportsCount}}
+✅ Подтверждено: {{confirmedReportsCount}}
+❎ Отклонено: {{notConfirmedReportCount}}
+📏 Точность: {{percent}}
+

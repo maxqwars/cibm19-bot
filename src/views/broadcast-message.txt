@@ -1,0 +1,5 @@
+⚠️ Оповещение
+
+{{broadcastMessage}}
+
+Инициатор: @{{authorSignature}} / {{authorRole}}
