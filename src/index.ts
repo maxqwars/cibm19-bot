@@ -128,6 +128,10 @@ const COMPONENTS = [
     name: "reports",
     component: reports,
   },
+  {
+    name: "cache",
+    component: cache,
+  },
 ];
 
 // Create blaze-bot

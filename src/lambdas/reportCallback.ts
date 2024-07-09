@@ -71,7 +71,7 @@ export const reportCallback = new Impact({
         break;
       }
 
-      case "configm_report_big": {
+      case "confirm_report_big": {
         await confirm(hash, BIG_REWARD);
         confirmed = true;
         break;

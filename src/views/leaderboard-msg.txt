@@ -1,0 +1,11 @@
+🏆 Топ точности
+
+{{accuracyTop}}
+
+🏆 Топ кол-во отчётов
+
+{{reportsTop}}
+
+🏆 Топ подтвержденных
+
+{{confirmedReportsTop}}
