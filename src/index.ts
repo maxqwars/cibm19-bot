@@ -5,7 +5,6 @@ import { join } from "node:path";
 // Third party modules
 import { config } from "dotenv";
 import { $Enums, PrismaClient } from "@prisma/client";
-import memjs from "memjs";
 import { BotCore } from "./modules/BotCore";
 import { Telegraf } from "telegraf";
 import redis, { RedisClientType } from "redis";
