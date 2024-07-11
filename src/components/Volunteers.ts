@@ -44,12 +44,14 @@ export class Volunteers {
 
     const cache = await this._cache.get(`volunteer_data_${id}`);
 
-    if (cache === null || cache.toString().length === 0) {
+    console.log(`volunteer_data_${id} cache`, cache);
+
+    if (!cache) {
       this._logger.info(
         `[Volonteers._getVolunteerDataWithCache] Cache for volonteer ${id} not found, generate cache...`,
       );
-      const volunteerData = await this._client.volunteer.findFirst({ where: { id } });
 
+      const volunteerData = await this._client.volunteer.findFirst({ where: { id } });
       if (!volunteerData) return null;
 
       const createdCache = await this._cache.set(
@@ -57,23 +59,30 @@ export class Volunteers {
         JSON.stringify({ ...volunteerData, telegramId: Number(volunteerData.telegramId) }),
         VOLUNTEER_DATA_LIFETIME,
       );
+
       this._logger.info(
         `[Volonteers._getVolunteerDataWithCache] Cache for volonteer ${id} created, result ${createdCache}`,
       );
+
       return volunteerData;
     }
 
-    const volunteerData = JSON.parse(cache.toString());
+    const volunteerData = JSON.parse(cache);
     return volunteerData as Volunteer;
   }
 
   private async _findVolunteerSystemIdUsingTelegramId(telegramId: number) {
     const cache = await this._cache.get(`system_to_telegram_id=${telegramId}`);
 
-    if (cache === null || cache.toString().length === 0) {
+    this._logger.info(
+      `[Volunteers._findVolunteerSystemIdUsingTelegramId] cache value for key system_to_telegram_id=${telegramId} -> ${cache}`,
+    );
+
+    if (!cache) {
       this._logger.info(
         `[Volonteers._findVolunteerSystemIdUsingTelegramId] Cache for volonteer ${telegramId} not found, generate cache...`,
       );
+
       const volunteerData = await this._client.volunteer.findUnique({
         where: { telegramId },
         select: {
@@ -84,14 +93,18 @@ export class Volunteers {
       if (!volunteerData) return 0;
 
       const createdCache = await this._cache.set(
-        `system_to_telegram_id=${volunteerData.id}`,
+        `system_to_telegram_id=${telegramId}`,
         String(volunteerData.id),
         TG_ID_TO_SYS_ID_BIND_LIFETIME,
       );
+
+      console.log("createdCache", createdCache);
+
       this._logger.info(
         `[Volonteers._findVolunteerSystemIdUsingTelegramId] Cache for volonteer ${telegramId} created, result ${createdCache}`,
       );
-      return Number(createdCache);
+
+      return volunteerData.id;
     }
 
     return Number(cache);
@@ -99,6 +112,9 @@ export class Volunteers {
 
   async findVolunteerUnderTelegramId(telegramId: number) {
     const volonteerSystemId = await this._findVolunteerSystemIdUsingTelegramId(telegramId);
+
+    console.log("volonteerSystemId", volonteerSystemId);
+
     const volunteerData = await this._getVolunteerDataWithCache(volonteerSystemId);
     return volunteerData;
   }

@@ -62,29 +62,28 @@ const REDIS_URL = env.REDIS_URL;
 // Init build-in logger
 const logger = new BuildInLogger(NODE_ENV === "production" ? "error" : "all");
 
-
-let redisIsReady = false
-let redisClient: RedisClientType
+let redisIsReady = false;
+let redisClient: RedisClientType;
 async function getRedis(): Promise<RedisClientType> {
   if (!redisIsReady) {
     redisClient = redis.createClient({
-      url: REDIS_URL
-    })
-    redisClient.on('error', err => logger.error(`Redis Error: ${err}`))
-    redisClient.on('connect', () => logger.info('Redis connected'))
-    redisClient.on('reconnecting', () => logger.info('Redis reconnecting'))
-    redisClient.on('ready', () => {
-      redisIsReady = true
-      logger.info('Redis ready!')
-    })
-    await redisClient.connect()
+      url: REDIS_URL,
+    });
+    redisClient.on("error", (err) => logger.error(`Redis Error: ${err}`));
+    redisClient.on("connect", () => logger.info("Redis connected"));
+    redisClient.on("reconnecting", () => logger.info("Redis reconnecting"));
+    redisClient.on("ready", () => {
+      redisIsReady = true;
+      logger.info("Redis ready!");
+    });
+    await redisClient.connect();
   }
-  return redisClient
+  return redisClient;
 }
 
 // Init modules
 const prisma = new PrismaClient();
-const redisCacheClient = await getRedis()
+const redisCacheClient = await getRedis();
 const cache = new Cache(redisCacheClient, logger);
 const render = new Render(join(cwd(), "./src/views"), cache, logger);
 const volunteers = new Volunteers(prisma, cache, logger);
