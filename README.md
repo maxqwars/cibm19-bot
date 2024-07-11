@@ -1,4 +1,4 @@
-# RCIBM - Cyberdrug Bot
+# RCIBM - Cyberdruzhina Bot
 
 Source code of Telegram bot for organizing the work of volunteers and volunteers in the Cyberdruzhina squads at the Regional Center for Information Security 🛡️ of Youth of the Republic of Khakassia.
 
