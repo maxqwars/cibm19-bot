@@ -9,14 +9,6 @@ export default [
       format: "es",
     },
     plugins: [typescript(), nodeResolve()],
-    external: [
-      "telegraf",
-      "telegraf/helpers.js",
-      "dotenv",
-      "@prisma/client",
-      "pino",
-      "dayjs",
-      "redis",
-    ],
+    external: ["telegraf", "telegraf/helpers.js", "dotenv", "@prisma/client", "pino", "dayjs", "redis"],
   },
 ];
