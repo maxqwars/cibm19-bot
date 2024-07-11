@@ -21,6 +21,7 @@ export default [
       "simple-node-logger",
       "memjs",
       "dayjs",
+      "redis"
     ],
   },
 ];
