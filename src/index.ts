@@ -8,7 +8,7 @@ import { $Enums, PrismaClient } from "@prisma/client";
 import memjs from "memjs";
 import { BotCore } from "./modules/BotCore";
 import { Telegraf } from "telegraf";
-import redis from "redis";
+import redis, { RedisClientType } from "redis";
 
 // Import Query callbacks
 import { claimCallback } from "./lambdas/claimCallback";
@@ -47,6 +47,7 @@ import { BuildInLogger } from "./components/BuildInLogger";
 
 // Import functions
 import { isSocialUrl } from "./functions/isSocialUrl";
+import { url } from "node:inspector";
 
 config();
 
@@ -56,17 +57,35 @@ config();
 const TELEGRAM_BOT_TOKEN = env["TELEGRAM_BOT_TOKEN"];
 const PRE_DEFINED_ADMINS = env["PRE_DEFINED_ADMINS"];
 const NODE_ENV = env["NODE_ENV"] || "development";
-const MEMCACHED_HOSTS = env["MEMCACHED_HOSTS"];
 const REDIS_URL = env.REDIS_URL;
 
-// Init external modules
-const prisma = new PrismaClient();
-const memClient = memjs.Client.create(MEMCACHED_HOSTS, {});
-const redisClient = await redis.createClient().connect();
-
-// Init components
+// Init build-in logger
 const logger = new BuildInLogger(NODE_ENV === "production" ? "error" : "all");
-const cache = new Cache(memClient, logger);
+
+
+let redisIsReady = false
+let redisClient: RedisClientType
+async function getRedis(): Promise<RedisClientType> {
+  if (!redisIsReady) {
+    redisClient = redis.createClient({
+      url: REDIS_URL
+    })
+    redisClient.on('error', err => logger.error(`Redis Error: ${err}`))
+    redisClient.on('connect', () => logger.info('Redis connected'))
+    redisClient.on('reconnecting', () => logger.info('Redis reconnecting'))
+    redisClient.on('ready', () => {
+      redisIsReady = true
+      logger.info('Redis ready!')
+    })
+    await redisClient.connect()
+  }
+  return redisClient
+}
+
+// Init modules
+const prisma = new PrismaClient();
+const redisCacheClient = await getRedis()
+const cache = new Cache(redisCacheClient, logger);
 const render = new Render(join(cwd(), "./src/views"), cache, logger);
 const volunteers = new Volunteers(prisma, cache, logger);
 const organizations = new Organizations(prisma, cache, logger);
