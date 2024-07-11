@@ -29,7 +29,7 @@ Source code of Telegram bot for organizing the work of volunteers and volunteers
 | 🟢      | /privacy      | Display the text of the privacy policy                                                                                                                              |
 | 🟢      | /reports      | Admin command displaying a list of all unprocessed content links                                                                                                    |
 | 🟢      | /start        | Display general information about the bot, welcome message                                                                                                          |
-| 🔴      | /leaderboard  | Table of leaders among organizations                                                                                                                                |
+| 🟢     | /leaderboard  | Table of leaders among organizations                                                                                                                                |
 | 🟢      | /lockdown     | Admin and curatorial command to enable / disable registration in the organization                                                                                   |
 | 🟢      | /team         | Table of leaders among the organization's participants                                                                                                              |
 | 🟢      | /profile      | Individual volunteer profile, statistics and general information                                                                                                    |
