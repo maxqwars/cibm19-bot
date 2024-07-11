@@ -1,7 +1,7 @@
 import { readdirSync, readFile } from "node:fs";
 import { join } from "node:path";
 import { Cache } from "./Cache";
-import { Logger } from "simple-node-logger";
+import { IBuildInLogger } from "./BuildInLogger";
 
 type TemplatePayloadData = {
   [key: string]: string | number | boolean;
@@ -11,9 +11,9 @@ export class Render {
   private _templates: string[];
   private readonly _cache: Cache;
   private readonly _viewsDirPath: string;
-  private readonly _logger: Logger;
+  private readonly _logger: IBuildInLogger;
 
-  constructor(viewsDir: string, cache: Cache, logger: Logger) {
+  constructor(viewsDir: string, cache: Cache, logger: IBuildInLogger) {
     this._viewsDirPath = viewsDir;
     this._templates = this._searchTempsInViews(viewsDir);
     this._cache = cache;

@@ -2,7 +2,7 @@ import { Context, Telegraf } from "telegraf";
 import { IScriptor } from "../helpers/Scriptor";
 import { IImpact } from "../helpers/Impact";
 import { CallbackQuery, Update } from "telegraf/typings/core/types/typegram";
-import { Logger } from "simple-node-logger";
+import { IBuildInLogger } from "../components/BuildInLogger";
 
 type CoreComponentsType = {
   name: string;
@@ -29,7 +29,7 @@ type SessionItem = {
 };
 
 interface IBotCoreConstructable {
-  new (logger: Logger, options: CoreOptionsType, components: CoreComponentsType): IBotCore;
+  new (logger: IBuildInLogger, options: CoreOptionsType, components: CoreComponentsType): IBotCore;
 }
 
 export interface IBotCore {
@@ -52,7 +52,7 @@ export interface IBotCore {
   init(bot: Telegraf<Context<Update>>): IBotCore;
   setSession(telegramId: number, session: SessionItem): SessionItem;
   components: { [key: string]: any };
-  logger: Logger;
+  logger: IBuildInLogger;
 }
 
 const CALLBACK_QUERY_RETRIES_COUNT = 10;
@@ -64,12 +64,12 @@ export class BotCore implements IBotCore {
   private readonly _sessions: { [key: number]: SessionItem };
   private readonly _availableCom: string[] = [];
 
-  private readonly _logger: Logger;
+  private readonly _logger: IBuildInLogger;
 
   private _components: { [key: string]: any };
   private _flowKeyToScriptMap: { [key: string]: IScriptor };
 
-  constructor(logger: Logger, options: CoreOptionsType, components: CoreComponentsType[]) {
+  constructor(logger: IBuildInLogger, options: CoreOptionsType, components: CoreComponentsType[]) {
     this._scripts = options.scripts;
     this._preDefinedAdmins = options.preDefinedAdmins;
     this._flowKeyToScriptMap = {};

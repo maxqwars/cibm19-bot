@@ -5,10 +5,9 @@ import { join } from "node:path";
 // Third party modules
 import { config } from "dotenv";
 import { $Enums, PrismaClient } from "@prisma/client";
-import memjs from "memjs";
 import { BotCore } from "./modules/BotCore";
-import { createLogger } from "./logger";
 import { Telegraf } from "telegraf";
+import redis, { RedisClientType } from "redis";
 
 // Import Query callbacks
 import { claimCallback } from "./lambdas/claimCallback";
@@ -43,9 +42,11 @@ import { Volunteers } from "./components/Volunteers";
 import { Organizations } from "./components/Organizations";
 import { Claims } from "./components/Claims";
 import { Reports } from "./components/Reports";
+import { BuildInLogger } from "./components/BuildInLogger";
 
 // Import functions
 import { isSocialUrl } from "./functions/isSocialUrl";
+import { url } from "node:inspector";
 
 config();
 
@@ -55,15 +56,34 @@ config();
 const TELEGRAM_BOT_TOKEN = env["TELEGRAM_BOT_TOKEN"];
 const PRE_DEFINED_ADMINS = env["PRE_DEFINED_ADMINS"];
 const NODE_ENV = env["NODE_ENV"] || "development";
-const MEMCACHED_HOSTS = env["MEMCACHED_HOSTS"];
+const REDIS_URL = env.REDIS_URL;
 
-// Init external modules
+// Init build-in logger
+const logger = new BuildInLogger(NODE_ENV === "production" ? "error" : "all");
+
+let redisIsReady = false;
+let redisClient: RedisClientType;
+async function getRedis(): Promise<RedisClientType> {
+  if (!redisIsReady) {
+    redisClient = redis.createClient({
+      url: REDIS_URL,
+    });
+    redisClient.on("error", (err) => logger.error(`Redis Error: ${err}`));
+    redisClient.on("connect", () => logger.info("Redis connected"));
+    redisClient.on("reconnecting", () => logger.info("Redis reconnecting"));
+    redisClient.on("ready", () => {
+      redisIsReady = true;
+      logger.info("Redis ready!");
+    });
+    await redisClient.connect();
+  }
+  return redisClient;
+}
+
+// Init modules
 const prisma = new PrismaClient();
-const memClient = memjs.Client.create(MEMCACHED_HOSTS, {});
-const logger = createLogger(NODE_ENV as "development" | "production");
-
-// Init components
-const cache = new Cache(memClient, logger);
+const redisCacheClient = await getRedis();
+const cache = new Cache(redisCacheClient, logger);
 const render = new Render(join(cwd(), "./src/views"), cache, logger);
 const volunteers = new Volunteers(prisma, cache, logger);
 const organizations = new Organizations(prisma, cache, logger);
