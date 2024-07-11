@@ -8,8 +8,8 @@ export default [
   {
     input: "src/index.ts",
     output: {
-      file: "build/index.cjs",
-      format: "cjs",
+      file: "build/index.mjs",
+      format: "es",
     },
     plugins: [typescript(), nodeResolve()],
     external: [
@@ -21,7 +21,7 @@ export default [
       "simple-node-logger",
       "memjs",
       "dayjs",
-      "redis"
+      "redis",
     ],
   },
 ];

@@ -1,11 +1,11 @@
 import { Client } from "memjs";
-import { Logger } from "simple-node-logger";
+import { IBuildInLogger } from "./BuildInLogger";
 
 export class Cache {
   private readonly _client: Client;
-  private readonly _log: Logger;
+  private readonly _log: IBuildInLogger;
 
-  constructor(client: Client, logger: Logger) {
+  constructor(client: Client, logger: IBuildInLogger) {
     this._client = client;
     this._log = logger;
   }

@@ -7,8 +7,8 @@ import { config } from "dotenv";
 import { $Enums, PrismaClient } from "@prisma/client";
 import memjs from "memjs";
 import { BotCore } from "./modules/BotCore";
-import { createLogger } from "./logger";
 import { Telegraf } from "telegraf";
+import redis from "redis";
 
 // Import Query callbacks
 import { claimCallback } from "./lambdas/claimCallback";
@@ -43,6 +43,7 @@ import { Volunteers } from "./components/Volunteers";
 import { Organizations } from "./components/Organizations";
 import { Claims } from "./components/Claims";
 import { Reports } from "./components/Reports";
+import { BuildInLogger } from "./components/BuildInLogger";
 
 // Import functions
 import { isSocialUrl } from "./functions/isSocialUrl";
@@ -56,13 +57,15 @@ const TELEGRAM_BOT_TOKEN = env["TELEGRAM_BOT_TOKEN"];
 const PRE_DEFINED_ADMINS = env["PRE_DEFINED_ADMINS"];
 const NODE_ENV = env["NODE_ENV"] || "development";
 const MEMCACHED_HOSTS = env["MEMCACHED_HOSTS"];
+const REDIS_URL = env.REDIS_URL;
 
 // Init external modules
 const prisma = new PrismaClient();
 const memClient = memjs.Client.create(MEMCACHED_HOSTS, {});
-const logger = createLogger(NODE_ENV as "development" | "production");
+const redisClient = await redis.createClient().connect();
 
 // Init components
+const logger = new BuildInLogger(NODE_ENV === "production" ? "error" : "all");
 const cache = new Cache(memClient, logger);
 const render = new Render(join(cwd(), "./src/views"), cache, logger);
 const volunteers = new Volunteers(prisma, cache, logger);

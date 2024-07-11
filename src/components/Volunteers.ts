@@ -1,6 +1,6 @@
 import { $Enums, PrismaClient, Volunteer } from "@prisma/client";
 import { Cache } from "./Cache";
-import { Logger } from "simple-node-logger";
+import { IBuildInLogger } from "./BuildInLogger";
 
 type VolunteerCreateDataDto = {
   fio: string;
@@ -16,9 +16,9 @@ const TG_ID_TO_SYS_ID_BIND_LIFETIME = 1000 * 60 * 60 * 12; // Total 12 hours
 export class Volunteers {
   private readonly _client: PrismaClient;
   private readonly _cache: Cache;
-  private readonly _logger: Logger;
+  private readonly _logger: IBuildInLogger;
 
-  constructor(prisma: PrismaClient, cache: Cache, logger: Logger) {
+  constructor(prisma: PrismaClient, cache: Cache, logger: IBuildInLogger) {
     this._client = prisma;
     this._cache = cache;
     this._logger = logger;

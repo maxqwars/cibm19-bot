@@ -1,6 +1,6 @@
 import { Organization, PrismaClient } from "@prisma/client";
 import { Cache } from "./Cache";
-import { Logger } from "simple-node-logger";
+import { IBuildInLogger } from "./BuildInLogger";
 
 type OrganizationCreateDataDto = {
   name: string;
@@ -12,9 +12,9 @@ const ORG_CACHE_LIFETIME = 1000 * 60 * 60 * 5;
 export class Organizations {
   private readonly _client: PrismaClient;
   private readonly _cache: Cache;
-  private readonly _logger: Logger;
+  private readonly _logger: IBuildInLogger;
 
-  constructor(prisma: PrismaClient, cache: Cache, logger: Logger) {
+  constructor(prisma: PrismaClient, cache: Cache, logger: IBuildInLogger) {
     this._client = prisma;
     this._cache = cache;
     this._logger = logger;
