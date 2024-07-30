@@ -1,5 +1,5 @@
 // Build-in node modules
-import { env, cwd, report } from "node:process";
+import { env, cwd } from "node:process";
 import { join } from "node:path";
 
 // Third party modules
@@ -31,7 +31,7 @@ import { feedbackCommand } from "./scripts/feedbackCommand";
 import { setCuratorCommand } from "./scripts/setCuratorCommand";
 import { broadcastCommand } from "./scripts/broadcastCommand";
 import { globalBroadcastCommand } from "./scripts/globalBroadcastCommand";
-import { rmVolunteerCommand } from "./scripts/rmVolunteerCommand";
+import { removeVolunteerCommand } from "./scripts/rmVolunteerCommand";
 import { setAdminCommand } from "./scripts/setAdminCommand";
 import { rmOrganizationCommand } from "./scripts/rmOrganizationCommand";
 
@@ -46,7 +46,6 @@ import { BuildInLogger } from "./components/BuildInLogger";
 
 // Import functions
 import { isSocialUrl } from "./functions/isSocialUrl";
-import { url } from "node:inspector";
 
 config();
 
@@ -58,9 +57,6 @@ const PRE_DEFINED_ADMINS = env["PRE_DEFINED_ADMINS"];
 const NODE_ENV = env["NODE_ENV"] || "development";
 const REDIS_URL = env.REDIS_URL;
 
-// Init build-in logger
-const logger = new BuildInLogger(NODE_ENV === "production" ? "error" : "all");
-
 let redisIsReady = false;
 let redisClient: RedisClientType;
 async function getRedis(): Promise<RedisClientType> {
@@ -68,13 +64,13 @@ async function getRedis(): Promise<RedisClientType> {
     redisClient = redis.createClient({
       url: REDIS_URL,
     });
-    redisClient.on("error", (err) => logger.error(`Redis Error: ${err}`));
-    redisClient.on("connect", () => logger.info("Redis connected"));
-    redisClient.on("reconnecting", () => logger.info("Redis reconnecting"));
-    redisClient.on("ready", () => {
-      redisIsReady = true;
-      logger.info("Redis ready!");
-    });
+    // redisClient.on("error", (err) => logger.error(`Redis Error: ${err}`));
+    // redisClient.on("connect", () => logger.info("Redis connected"));
+    // redisClient.on("reconnecting", () => logger.info("Redis reconnecting"));
+    // redisClient.on("ready", () => {
+    //   redisIsReady = true;
+    //   logger.info("Redis ready!");
+    // });
     await redisClient.connect();
   }
   return redisClient;
@@ -83,6 +79,7 @@ async function getRedis(): Promise<RedisClientType> {
 // Init modules
 const prisma = new PrismaClient();
 const redisCacheClient = await getRedis();
+const logger = new BuildInLogger(NODE_ENV === "production" ? "error" : "all");
 const cache = new Cache(redisCacheClient, logger);
 const render = new Render(join(cwd(), "./src/views"), cache, logger);
 const volunteers = new Volunteers(prisma, cache, logger);
@@ -110,7 +107,7 @@ const SCRIPTS = [
   setCuratorCommand,
   broadcastCommand,
   globalBroadcastCommand,
-  rmVolunteerCommand,
+  removeVolunteerCommand,
   setAdminCommand,
   rmOrganizationCommand,
 ];
@@ -178,26 +175,26 @@ core
   })
   .addMiddleware(bot, async (ctx, core) => {
     const volunteers = core.getModule("volunteers") as Volunteers;
-    const candidate = await volunteers.findVolunteerUnderTelegramId(ctx.from.id);
+    const currentVolunteer = await volunteers.findVolunteerUnderTelegramId(ctx.from.id);
 
-    if (!candidate) {
+    if (!currentVolunteer) {
       const predefinedIds = PRE_DEFINED_ADMINS.split(",").map((str) => Number(str));
+      const created = await volunteers.createWithData({
+        fio: "",
+        telegramId: ctx.from.id,
+        telegramUsername: typeof ctx.from.username === null ? `id${ctx.from.id}` : ctx.from.username,
+        telegramName: `${ctx.from.first_name} ${ctx.from.last_name}`,
+        role: predefinedIds.find((id) => id === ctx.from.id) ? $Enums.ROLE.ADMIN : null,
+      });
 
-      try {
-        await volunteers.createWithData({
-          fio: "",
-          telegramId: ctx.from.id,
-          telegramUsername: typeof ctx.from.username === "undefined" ? `id${ctx.from.id}` : ctx.from.username,
-          telegramName: `${ctx.from.first_name} ${ctx.from.last_name}`,
-          role: predefinedIds.find((id) => id === ctx.from.id) ? $Enums.ROLE.ADMIN : null,
-        });
-      } catch (err) {
-        logger.error(`[top-level middleware] Failed create empty volunteer record, reason:`);
-        logger.error(err.message);
-        return;
+      if (created === null) {
+        logger.error(
+          `[core.middleware] Failed create minimal volunteer profile using minimal data. tg_id: "${ctx.from.id}", tg_username: "${ctx.from.username}"`,
+        );
       }
-    }
 
+      return;
+    }
     return;
   })
   .generateStageToScriptorMap()
@@ -209,12 +206,12 @@ core
       const render = core.getModule("render") as Render;
       const volunteers = core.getModule("volunteers") as Volunteers;
 
-      const volunteer = await volunteers.findVolunteerUnderTelegramId(ctx.from.id);
+      const currentVolunteer = await volunteers.findVolunteerUnderTelegramId(ctx.from.id);
 
       logger.info(`[NO SCRIPT] Is social link: ${isSocialUrl(ctx.text.trim())}`);
 
       if (isSocialUrl(ctx.text.trim())) {
-        const candidate = await reports.findReportFromVolunteerContainsPayload(volunteer.id, ctx.text.trim());
+        const candidate = await reports.findReportFromVolunteerContainsPayload(currentVolunteer.id, ctx.text.trim());
 
         if (candidate) {
           const replyContent = await render.render("report-already-created.txt", {});
@@ -224,7 +221,7 @@ core
 
         await reports.create({
           payload: ctx.text.trim(),
-          volunteerId: volunteer.id,
+          volunteerId: currentVolunteer.id,
         });
 
         const replyMessage = await render.render("report-created.txt", {});

@@ -35,7 +35,7 @@ export class Volunteers {
     } catch (err) {
       this._logger.error(`Failed create new volunteer record, reason:`);
       this._logger.error(err.message);
-      return;
+      return null;
     }
   }
 
